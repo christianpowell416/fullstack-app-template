@@ -2,13 +2,47 @@
 
 A comprehensive guide and runnable starter app for building a production mobile + web app using the same stack as [VSBO](https://vsbo.ai).
 
-> **This repo is a working Expo app.** Fork it, `npm install`, fill in your `.env.local`, and run `npx expo start` to see it in action. Then start building on top of it.
+---
+
+## Getting Started (2 Steps)
+
+### Step 1: Install Claude Code
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+> You'll need an [Anthropic API key](https://console.anthropic.com/) or a Claude Pro/Max subscription. Claude Code is the AI pair programmer that built the entire VSBO app — mobile, web, backend, admin dashboard, email system, everything. It reads your full codebase, writes code, runs commands, deploys, and debugs.
+
+### Step 2: Start Claude Code and tell it to set up the project
+
+```bash
+mkdir my-app && cd my-app
+claude
+```
+
+Then paste this into the Claude Code prompt:
+
+> Clone the template repo at https://github.com/christianpowell416/fullstack-app-template into the current directory, install all dependencies (mobile and website), copy the .env.example files to .env.local, and walk me through which API keys I need to fill in. Then initialize a new git repo and help me get the app running.
+
+Claude Code will:
+- Clone the repo and flatten it into your project directory
+- Run `npm install` for both mobile and website
+- Create your `.env.local` files from the examples
+- Walk you through each API key you need
+- Help you set up Supabase (project, migrations, secrets)
+- Get the app running locally
+
+From here, just keep talking to Claude Code. Tell it what you want to build and it'll build it.
+
+---
 
 ### What's Included Out of the Box
 - 3-tab navigation (Home, Explore, Profile) with haptic feedback
 - Dark/light theme system with automatic OS detection
 - Supabase client with auth-ready setup
 - AI proxy Edge Function (OpenAI + Gemini) — deploy and go
+- Full admin dashboard (Next.js) with user management, growth analytics, cost tracking
 - Themed text & view components (Inter font family)
 - Error boundary with retry UI
 - Native module compatibility layer (Expo Go + dev builds)
@@ -38,13 +72,15 @@ A comprehensive guide and runnable starter app for building a production mobile 
 
 ## Account Setup Checklist
 
+> Claude Code will walk you through all of this. Just tell it "help me set up my accounts and API keys" and it'll guide you through each one.
+
 ### Day 1 — Must Have
-- [ ] **Claude Code** — [claude.com/claude-code](https://claude.com/claude-code) — AI pair programmer. This is how the entire VSBO app was built. Install it first, use it for everything.
+- [ ] **Claude Code** — [claude.com/claude-code](https://claude.com/claude-code) — Install this first. It'll help you set up everything else.
+- [ ] **GitHub** — Repo for your app code
 - [ ] **Supabase** — [supabase.com](https://supabase.com) — Create a project (free tier is fine to start)
 - [ ] **Expo** — [expo.dev](https://expo.dev) — Sign up, install `eas-cli` globally
-- [ ] **Vercel** — [vercel.com](https://vercel.com) — Link to your GitHub repo
 - [ ] **OpenAI** — [platform.openai.com](https://platform.openai.com) — Get API key, set a spending limit
-- [ ] **GitHub** — Repo for your app code
+- [ ] **Vercel** — [vercel.com](https://vercel.com) — Link to your GitHub repo
 
 ### Day 2 — When You Need Them
 - [ ] **Google AI Studio** — [aistudio.google.com](https://aistudio.google.com) — Gemini API key (for image generation)
@@ -134,62 +170,54 @@ your-app/
 
 ---
 
-## Local Dev Setup
+## Local Dev Setup (Reference)
+
+> **You don't need to do any of this manually.** If you followed the "Getting Started" section above, Claude Code handled all of it. This section is here as a reference for what's happening under the hood.
+
+<details>
+<summary>Click to expand manual setup steps</summary>
 
 ### Prerequisites
-- **Claude Code** (`npm install -g @anthropic-ai/claude-code`) — you'll use this for everything below
 - Node.js 18+ (`node -v`)
 - npm or yarn
 - Supabase CLI (`npm install -g supabase`)
-- Expo CLI (`npm install -g expo-cli` or use `npx expo`)
+- Expo CLI (`npx expo`)
 - Vercel CLI (`npm install -g vercel`)
 - Git
 
 ### 1. Clone & Install
 
 ```bash
-# Clone your repo
 git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
 cd YOUR_REPO
-
-# Install mobile app dependencies
 npm install
-
-# Install website dependencies
 cd website && npm install && cd ..
 ```
 
 ### 2. Set Up Environment Variables
 
 ```bash
-# Copy example env files and fill in your keys
 cp .env.example .env.local
 cp website/.env.example website/.env.local
+# Fill in your API keys (see API Key Checklist above)
 ```
 
-### 3. Set Up Supabase Locally (Optional)
+### 3. Set Up Supabase
 
 ```bash
-# Start local Supabase (Docker required)
-supabase start
+# Push the starter schema to your Supabase project
+supabase db push
 
-# Run migrations
-supabase db reset
-
-# Generate TypeScript types from your schema
+# Generate TypeScript types
 supabase gen types typescript --local > lib/database.types.ts
-```
 
-### 4. Set Supabase Edge Function Secrets
-
-```bash
-# Set secrets for deployed Edge Functions
+# Set Edge Function secrets
 supabase secrets set OPENAI_API_KEY=sk-...
 supabase secrets set GEMINI_API_KEY=AI...
 supabase secrets set DEV_BYPASS_KEY=your-dev-key
 ```
 
-### 5. Start Development
+### 4. Start Development
 
 ```bash
 # Terminal 1 — Mobile app
@@ -202,23 +230,24 @@ cd website && npm run dev
 supabase functions serve
 ```
 
-### 6. Deploy
+### 5. Deploy
 
 ```bash
-# Deploy website to Vercel
+# Website
 cd website && vercel --prod
 
-# Deploy Edge Functions
+# Edge Functions
 supabase functions deploy ai-proxy
-supabase functions deploy generate-images
 
-# Push database migrations
+# Database migrations
 supabase db push
 
-# Build mobile app
+# Mobile builds
 eas build --platform ios --profile production
 eas build --platform android --profile production
 ```
+
+</details>
 
 ---
 
@@ -340,36 +369,34 @@ export async function aiChat(messages: Array<{ role: string; content: string }>)
 
 [Claude Code](https://claude.com/claude-code) is an AI pair programmer that runs in your terminal and reads your entire codebase. It writes code, runs commands, deploys, debugs, and commits. You describe what you want and it builds it.
 
-### Getting Started
+### How to Use It
 
-```bash
-# Install
-npm install -g @anthropic-ai/claude-code
+Just run `claude` in your project root and talk to it. Examples of things you can say:
 
-# Run in your project root
-claude
-```
+- "Add Google authentication to the app"
+- "Create a new tab that shows a feed of posts"
+- "Deploy the website to Vercel and check the logs"
+- "Set up Resend for email and add a welcome email on signup"
+- "Add a settings screen with a dark mode toggle"
+- "The app crashes when I tap the profile tab — fix it"
+- "Add a new cron job that sends daily digest emails"
+- "Push the latest changes to GitHub"
+
+Claude Code will read the relevant files, make the changes, test them, and commit. You just review and approve.
 
 ### CLAUDE.md — Your Project's Brain
 
-Create a `CLAUDE.md` in your repo root (use the template in this repo). Claude reads this at the start of every session. This is how you teach it your project's conventions, architecture, and deployment process. The more context you put here, the better Claude performs.
-
-Include:
-- Project architecture overview
-- Key file locations and line numbers
-- Naming conventions and patterns
-- Deployment commands and verification steps
-- Known quirks and things to avoid
+This repo includes a starter `CLAUDE.md`. Claude reads this at the start of every session. This is how you teach it your project's conventions, architecture, and deployment process. **Update it as your project evolves** — the more context you put here, the better Claude performs.
 
 ### Tips
 
-1. **Start with CLAUDE.md on day 1** — Even a few lines of architecture context makes a huge difference
+1. **Update CLAUDE.md as you go** — When you establish a pattern (naming convention, deployment step, etc.), tell Claude to add it to CLAUDE.md so it remembers next session
 2. **Include deployment verification** — Tell Claude to always check logs after deploying (it will actually do it)
 3. **Document your AI prompts** — If your app uses AI, keep prompts documented so Claude can update them correctly
 4. **Use notification sounds** — Add a beep command so you know when Claude finishes a long task (see CLAUDE.md template)
-5. **Track native module patterns** — If using Expo, document which modules need special handling for Expo Go
-6. **Let it commit** — Claude writes good commit messages. Let it commit and push as you go
-7. **Trust it to explore** — Claude can grep, glob, read files, and understand your whole codebase. Tell it what you want, not which file to edit
+5. **Let it commit** — Claude writes good commit messages. Let it commit and push as you go
+6. **Trust it to explore** — Claude can read your full codebase. Tell it what you want, not which file to edit
+7. **Let it deploy** — Claude can run `vercel --prod`, `supabase functions deploy`, `eas build`, etc. Just tell it to deploy and verify
 
 ---
 
