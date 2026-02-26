@@ -1,0 +1,76 @@
+{
+  "expo": {
+    "name": "my-app",
+    "slug": "my-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.myapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": ["C617.1"]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": ["E174.1"]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyTracking": false
+      }
+    },
+    "android": {
+      "package": "com.yourname.myapp",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/icon.png"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 30000
+    },
+    "runtimeVersion": "1.0.0",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "backgroundColor": "#FFFFFF",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#121212"
+          }
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

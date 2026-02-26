@@ -1,8 +1,19 @@
 # Clone My Stack — Full-Stack App Template
 
-A comprehensive guide and starter config for building a production mobile + web app using the same stack as [VSBO](https://vsbo.ai).
+A comprehensive guide and runnable starter app for building a production mobile + web app using the same stack as [VSBO](https://vsbo.ai).
 
-> **This repo is documentation + config files, not a runnable app.** Fork it, fill in placeholders, then start building your own app on top of these patterns.
+> **This repo is a working Expo app.** Fork it, `npm install`, fill in your `.env.local`, and run `npx expo start` to see it in action. Then start building on top of it.
+
+### What's Included Out of the Box
+- 3-tab navigation (Home, Explore, Profile) with haptic feedback
+- Dark/light theme system with automatic OS detection
+- Supabase client with auth-ready setup
+- AI proxy Edge Function (OpenAI + Gemini) — deploy and go
+- Themed text & view components (Inter font family)
+- Error boundary with retry UI
+- Native module compatibility layer (Expo Go + dev builds)
+- AI client library wired to the proxy
+- Full deployment guide (Vercel, EAS, Supabase)
 
 ---
 
