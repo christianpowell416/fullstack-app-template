@@ -56,6 +56,26 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 
 
 -- ===========================================
+-- ADMIN USERS TABLE
+-- ===========================================
+-- Controls who can access the admin dashboard.
+-- Add yourself after signing up:
+--   INSERT INTO admin_users (id, role) VALUES ('your-user-uuid', 'admin');
+
+CREATE TABLE IF NOT EXISTS admin_users (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  role TEXT DEFAULT 'admin'  -- 'admin' or other roles you define
+);
+
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
+
+-- Only admins can read the admin_users table (to check their own access)
+CREATE POLICY "Admins can check their own access"
+  ON admin_users FOR SELECT
+  USING (auth.uid() = id);
+
+
+-- ===========================================
 -- API USAGE TRACKING
 -- ===========================================
 -- Track daily AI API usage per user for cost management and rate limiting.
