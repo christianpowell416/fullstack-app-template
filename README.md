@@ -21,13 +21,14 @@ A comprehensive guide and starter config for building a production mobile + web 
 | **Payments** | [RevenueCat](https://www.revenuecat.com) | In-app subscriptions | Handles Apple/Google receipt validation |
 | **Email** | [Resend](https://resend.com) | Transactional & marketing email | Modern API, React email templates, webhooks |
 | **Cost Analytics** | [BigQuery](https://cloud.google.com/bigquery) | GCP billing export analysis | Reconcile AI costs against billing data |
-| **AI Dev Tool** | [Claude Code](https://claude.com/claude-code) | AI pair programmer | Understands full codebase via CLAUDE.md |
+| **AI Dev Tool** | [Claude Code](https://claude.com/claude-code) | AI pair programmer (mandatory) | Built the entire VSBO app. Reads your full codebase, writes code, deploys, debugs. |
 
 ---
 
 ## Account Setup Checklist
 
 ### Day 1 — Must Have
+- [ ] **Claude Code** — [claude.com/claude-code](https://claude.com/claude-code) — AI pair programmer. This is how the entire VSBO app was built. Install it first, use it for everything.
 - [ ] **Supabase** — [supabase.com](https://supabase.com) — Create a project (free tier is fine to start)
 - [ ] **Expo** — [expo.dev](https://expo.dev) — Sign up, install `eas-cli` globally
 - [ ] **Vercel** — [vercel.com](https://vercel.com) — Link to your GitHub repo
@@ -43,7 +44,6 @@ A comprehensive guide and starter config for building a production mobile + web 
 - [ ] **Google Cloud** — [console.cloud.google.com](https://console.cloud.google.com) — BigQuery billing export for cost tracking
 - [ ] **Apple Developer** — [developer.apple.com](https://developer.apple.com) — $99/year, required for App Store
 - [ ] **Google Play Developer** — [play.google.com/console](https://play.google.com/console) — $25 one-time, required for Play Store
-- [ ] **Claude Code** — [claude.com/claude-code](https://claude.com/claude-code) — AI pair programmer (highly recommended)
 
 ---
 
@@ -126,6 +126,7 @@ your-app/
 ## Local Dev Setup
 
 ### Prerequisites
+- **Claude Code** (`npm install -g @anthropic-ai/claude-code`) — you'll use this for everything below
 - Node.js 18+ (`node -v`)
 - npm or yarn
 - Supabase CLI (`npm install -g supabase`)
@@ -324,26 +325,40 @@ export async function aiChat(messages: Array<{ role: string; content: string }>)
 
 ## Claude Code Workflow
 
-[Claude Code](https://claude.com/claude-code) is an AI pair programmer that reads your entire codebase. Here's how to get the most out of it:
+> **Claude Code is not optional.** The entire VSBO app — mobile, web, backend, edge functions, migrations, email system, admin dashboard — was built with Claude Code. It's the most important tool in this stack.
+
+[Claude Code](https://claude.com/claude-code) is an AI pair programmer that runs in your terminal and reads your entire codebase. It writes code, runs commands, deploys, debugs, and commits. You describe what you want and it builds it.
+
+### Getting Started
+
+```bash
+# Install
+npm install -g @anthropic-ai/claude-code
+
+# Run in your project root
+claude
+```
 
 ### CLAUDE.md — Your Project's Brain
 
-Create a `CLAUDE.md` in your repo root. Claude reads this every session. Include:
-- Project architecture overview
-- Key file locations
-- Conventions and patterns
-- Deployment commands
-- Things to avoid
+Create a `CLAUDE.md` in your repo root (use the template in this repo). Claude reads this at the start of every session. This is how you teach it your project's conventions, architecture, and deployment process. The more context you put here, the better Claude performs.
 
-See the included `CLAUDE.md` template in this repo.
+Include:
+- Project architecture overview
+- Key file locations and line numbers
+- Naming conventions and patterns
+- Deployment commands and verification steps
+- Known quirks and things to avoid
 
 ### Tips
 
-1. **Be specific in CLAUDE.md** — The more context you give, the better the suggestions
-2. **Include deployment verification** — Tell Claude to check logs after deploying
+1. **Start with CLAUDE.md on day 1** — Even a few lines of architecture context makes a huge difference
+2. **Include deployment verification** — Tell Claude to always check logs after deploying (it will actually do it)
 3. **Document your AI prompts** — If your app uses AI, keep prompts documented so Claude can update them correctly
-4. **Use notification sounds** — Add a beep command so you know when Claude finishes a long task
-5. **Track native module patterns** — If using Expo, document which modules need special handling
+4. **Use notification sounds** — Add a beep command so you know when Claude finishes a long task (see CLAUDE.md template)
+5. **Track native module patterns** — If using Expo, document which modules need special handling for Expo Go
+6. **Let it commit** — Claude writes good commit messages. Let it commit and push as you go
+7. **Trust it to explore** — Claude can grep, glob, read files, and understand your whole codebase. Tell it what you want, not which file to edit
 
 ---
 
