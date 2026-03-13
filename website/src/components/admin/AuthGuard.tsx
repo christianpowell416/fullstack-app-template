@@ -4,42 +4,52 @@ import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase-client'
 import { AuthContext } from './AuthContext'
+import type { Profile, UserRole } from '@/lib/types'
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [role, setRole] = useState<string | null>(null)
+  const [user, setUser] = useState<Profile | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
 
-      if (!session) {
+        if (!session) {
+          router.push('/admin/login')
+          return
+        }
+
+        // Fetch the user's profile with role
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single()
+
+        if (error || !profile) {
+          await supabase.auth.signOut()
+          router.push('/admin/login?error=no_profile')
+          return
+        }
+
+        if (!profile.is_active) {
+          await supabase.auth.signOut()
+          router.push('/admin/login?error=deactivated')
+          return
+        }
+
+        setUser(profile as Profile)
+        setIsAuthenticated(true)
+      } catch {
         router.push('/admin/login')
-        return
+      } finally {
+        setIsLoading(false)
       }
-
-      // Check if user is an admin
-      const { data: adminUser } = await supabase
-        .from('admin_users')
-        .select('id, role')
-        .eq('id', session.user.id)
-        .single()
-
-      if (!adminUser) {
-        await supabase.auth.signOut()
-        router.push('/admin/login?error=unauthorized')
-        return
-      }
-
-      setUserId(adminUser.id)
-      setRole(adminUser.role)
-      setIsAuthenticated(true)
-      setIsLoading(false)
     }
 
     checkAuth()
@@ -47,7 +57,24 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: string) => {
         if (event === 'SIGNED_OUT') {
+          setUser(null)
+          setIsAuthenticated(false)
           router.push('/admin/login')
+        } else if (event === 'SIGNED_IN') {
+          // Re-fetch profile on sign in
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+            if (profile) {
+              setUser(profile as Profile)
+              setIsAuthenticated(true)
+              setIsLoading(false)
+            }
+          }
         }
       }
     )
@@ -57,21 +84,27 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-admin-bg">
+      <div className="min-h-screen flex items-center justify-center bg-dark-bg">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-accent border-t-transparent mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-accent border-t-transparent mx-auto mb-4" />
           <p className="text-dark-text-secondary">Loading...</p>
         </div>
       </div>
     )
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return null
   }
 
   return (
-    <AuthContext.Provider value={{ userId, role, isLoading: false }}>
+    <AuthContext.Provider value={{
+      user,
+      userId: user.id,
+      role: user.role as UserRole,
+      isAdmin: user.role === 'admin',
+      isLoading: false,
+    }}>
       {children}
     </AuthContext.Provider>
   )

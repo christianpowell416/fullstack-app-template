@@ -9,38 +9,38 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand accent — change this to match your app
-        'accent': '#0095F6',
-        'accent-hover': '#0077CC',
+        // Mavericks brand
+        'accent': '#7052F5',
+        'accent-hover': '#5E3FE0',
+        'green': '#76E59F',
+        'green-hover': '#5CD88A',
 
-        // Light mode
-        'light-bg': '#FFFFFF',
-        'light-card': '#FFFFFF',
-        'light-border': '#DBDBDB',
-        'light-text': '#000000',
-        'light-text-secondary': '#666666',
-
-        // Dark mode (admin dashboard)
-        'dark-bg': '#1e1e1e',
-        'dark-card': '#222222',
-        'dark-border': '#333333',
+        // Dark mode
+        'dark-bg': '#1A191E',
+        'dark-card': '#232228',
+        'dark-border': '#2E2D35',
         'dark-text': '#FFFFFF',
-        'dark-text-secondary': '#a0a0a0',
+        'dark-text-secondary': '#A29DB7',
 
-        // Navigation bars
-        'nav-bg': '#1a1a1a',
-        'nav-border': '#2a2a2a',
+        // Light purple surfaces
+        'light-purple': '#F2EFFF',
+
+        // Navigation
+        'nav-bg': '#151419',
+        'nav-border': '#2E2D35',
 
         // Admin background
-        'admin-bg': '#3a3a3a',
+        'admin-bg': '#1A191E',
 
         // Status colors
-        'success': '#4CAF50',
-        'error': '#f44336',
-        'warning': '#FF9500',
+        'success': '#76E59F',
+        'error': '#F5527B',
+        'warning': '#F5A623',
       },
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        display: ['var(--font-krona)', 'sans-serif'],
+        heading: ['var(--font-space)', 'sans-serif'],
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         'xl': '16px',
@@ -48,9 +48,10 @@ const config: Config = {
         '3xl': '24px',
       },
       boxShadow: {
-        'card': '0 2px 8px rgba(0, 0, 0, 0.1)',
-        'card-hover': '0 4px 16px rgba(0, 0, 0, 0.15)',
-        'button': '0 2px 4px rgba(0, 0, 0, 0.1)',
+        'card': '0 2px 8px rgba(0, 0, 0, 0.2)',
+        'card-hover': '0 4px 16px rgba(0, 0, 0, 0.3)',
+        'button': '0 2px 4px rgba(0, 0, 0, 0.2)',
+        'glow': '0 0 20px rgba(112, 82, 245, 0.3)',
       },
       keyframes: {
         fadeIn: {
@@ -61,10 +62,15 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
       animation: {
-        'fadeIn': 'fadeIn 0.5s ease-out',
-        'slideUp': 'slideUp 0.6s ease-out',
+        'fadeIn': 'fadeIn 0.5s ease-out forwards',
+        'slideUp': 'slideUp 0.6s ease-out forwards',
+        'shimmer': 'shimmer 2s infinite linear',
       },
     },
   },

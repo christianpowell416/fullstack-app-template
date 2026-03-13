@@ -4,7 +4,17 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Sidebar from './Sidebar'
 import AuthGuard from './AuthGuard'
-import { PageTitleProvider } from './PageTitleContext'
+import { PageTitleProvider, usePageTitle } from './PageTitleContext'
+
+function MainContent({ children }: { children: React.ReactNode }) {
+  const { headerTabs } = usePageTitle()
+  const hasTabs = headerTabs.length > 0
+  return (
+    <main className={`pl-12 md:pl-16 pt-16 min-h-screen relative z-10 ${hasTabs ? 'max-md:pt-28' : ''}`}>
+      {children}
+    </main>
+  )
+}
 
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
@@ -28,9 +38,7 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
       {mounted && <Sidebar />}
 
       {/* Main content */}
-      <main className="pl-12 md:pl-16 pt-16 min-h-screen relative z-10">
-        {children}
-      </main>
+      <MainContent>{children}</MainContent>
     </PageTitleProvider>
   )
 }

@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Space_Grotesk, Krona_One } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space' })
+const kronaOne = Krona_One({ weight: '400', subsets: ['latin'], variable: '--font-krona' })
 
 export const metadata: Metadata = {
-  title: 'My App - Admin',
-  description: 'Admin dashboard',
+  title: 'Mavericks - Recruiting Dashboard',
+  description: 'AI-powered recruiting platform',
 }
 
 export default function RootLayout({
@@ -15,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} ${spaceGrotesk.variable} ${kronaOne.variable} ${inter.className}`}>
         {children}
       </body>
     </html>

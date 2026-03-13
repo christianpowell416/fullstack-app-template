@@ -1,63 +1,46 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { useRouter } from 'next/navigation'
-import { createBrowserClient } from '@supabase/ssr'
+import { useState, Suspense, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase-client'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const supabase = createClient()
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  )
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (signInError) {
-        setError(signInError.message)
-        setLoading(false)
-        return
-      }
-
-      if (!data.user) {
-        setError('Login failed')
-        setLoading(false)
-        return
-      }
-
-      // Check admin access
-      const { data: adminUser } = await supabase
-        .from('admin_users')
-        .select('id, role')
-        .eq('id', data.user.id)
-        .single()
-
-      if (!adminUser) {
-        setError('You do not have admin access')
-        await supabase.auth.signOut()
-        setLoading(false)
-        return
-      }
-
-      router.push('/admin')
-    } catch {
-      setError('An unexpected error occurred')
-      setLoading(false)
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'unauthorized') {
+      setError('You do not have access to this platform.')
+    } else if (errorParam === 'no_profile') {
+      setError('Account setup incomplete. Contact your admin.')
+    } else if (errorParam === 'deactivated') {
+      setError('Your account has been deactivated. Contact your admin.')
     }
+  }, [searchParams])
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (signInError) {
+      setError(signInError.message)
+      setLoading(false)
+      return
+    }
+
+    router.push('/admin')
   }
 
   return (
@@ -65,24 +48,29 @@ function LoginForm() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-accent rounded-2xl mb-4 shadow-card">
-            <span className="text-white text-2xl font-bold">A</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white">Admin Portal</h1>
-          <p className="text-dark-text-secondary mt-1">Sign in to access the dashboard</p>
+          <img src="/mavericks-logo.png" alt="Mavericks" className="w-20 h-20 rounded-2xl mb-6 shadow-glow mx-auto object-cover" />
+          <h1 className="text-3xl font-display text-white mb-2">Mavericks</h1>
+          <p className="text-dark-text-secondary font-heading">Internal Recruiting Platform</p>
         </div>
 
-        {/* Login Form */}
+        {/* Login Card */}
         <div className="bg-dark-card rounded-3xl shadow-card border border-dark-border p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-lg font-heading font-semibold text-white mb-2">Sign In</h2>
+            <p className="text-dark-text-secondary text-sm">
+              Enter your credentials to access the dashboard.
+            </p>
+          </div>
+
           {error && (
-            <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-2xl">
+            <div className="mb-4 p-3 bg-error/10 border border-error/20 rounded-xl">
               <p className="text-sm text-error">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-dark-text-secondary mb-1.5">
                 Email
               </label>
               <input
@@ -90,14 +78,15 @@ function LoginForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-2xl text-white placeholder-dark-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-                placeholder="admin@yourapp.com"
                 required
+                autoComplete="email"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-3 text-white placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                placeholder="you@mavericksondemand.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-dark-text-secondary mb-1.5">
                 Password
               </label>
               <input
@@ -105,16 +94,17 @@ function LoginForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-2xl text-white placeholder-dark-text-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all"
-                placeholder="Enter your password"
                 required
+                autoComplete="current-password"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-3 text-white placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                placeholder="Enter your password"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-accent text-white py-4 rounded-2xl font-semibold hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-button"
+              className="w-full bg-accent text-white py-4 rounded-2xl font-heading font-semibold hover:bg-accent-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-button hover:shadow-glow mt-2"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -130,12 +120,13 @@ function LoginForm() {
             </button>
           </form>
 
-          {/* Add OAuth buttons here if needed:
-              Google, Apple, GitHub, etc. */}
+          <p className="text-center text-dark-text-secondary/50 text-xs mt-6">
+            Contact your admin if you need access or forgot your password.
+          </p>
         </div>
 
-        <p className="text-center text-dark-text-secondary text-sm mt-8">
-          Admin Portal
+        <p className="text-center text-dark-text-secondary/50 text-xs mt-8">
+          Mavericks On Demand - Internal Use Only
         </p>
       </div>
     </div>
