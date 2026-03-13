@@ -23,7 +23,7 @@ export default function CandidatePoolPage() {
       .from('candidates')
       .select(`
         *,
-        recruiter:profiles!candidates_recruiter_id_fkey(first_name, last_name),
+        recruiter:profiles!candidates_recruiter_profile_fkey(first_name, last_name),
         claims:candidate_claims(*)
       `)
       .eq('status', 'rejected')

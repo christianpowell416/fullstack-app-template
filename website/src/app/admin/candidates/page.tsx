@@ -34,7 +34,7 @@ export default function CandidatesPage() {
   const fetchCandidates = useCallback(async () => {
     let query = supabase
       .from('candidates')
-      .select('*, recruiter:profiles!candidates_recruiter_id_fkey(first_name, last_name)')
+      .select('*, recruiter:profiles!candidates_recruiter_profile_fkey(first_name, last_name)')
       .order(sortField, { ascending: sortDir === 'asc' })
 
     if (!isAdmin) {

@@ -37,21 +37,52 @@ export default function ProjectsPage() {
   useEffect(() => { fetchProjects() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProjects = async () => {
+    // Fetch projects with counts
     const { data } = await supabase
       .from('projects')
       .select(`
         *,
         assignments:project_assignments(count),
-        hires:candidates(count),
-        assignment_rows:project_assignments(id, recruiter_id, individual_hire_goal, recruiter:profiles!project_assignments_recruiter_id_fkey(id, first_name, last_name, email))
+        hires:candidates(count)
       `)
       .order('start_date', { ascending: false })
+
+    // Fetch assignments separately (FK goes to auth.users, not profiles directly)
+    const { data: assignmentData } = await supabase
+      .from('project_assignments')
+      .select('id, project_id, recruiter_id, individual_hire_goal')
+
+    // Fetch recruiter profiles for assigned recruiters
+    const recruiterIds = [...new Set((assignmentData || []).map((a: any) => a.recruiter_id))]
+    let recruiterMap: Record<string, any> = {}
+    if (recruiterIds.length > 0) {
+      const { data: recruiters } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email')
+        .in('id', recruiterIds)
+      for (const r of recruiters || []) {
+        recruiterMap[r.id] = r
+      }
+    }
+
+    // Combine assignments with recruiter profiles
+    const assignmentsByProject: Record<string, ProjectAssignmentRow[]> = {}
+    for (const a of assignmentData || []) {
+      const row: ProjectAssignmentRow = {
+        id: a.id,
+        recruiter_id: a.recruiter_id,
+        individual_hire_goal: a.individual_hire_goal,
+        recruiter: recruiterMap[a.recruiter_id] || { id: a.recruiter_id, first_name: null, last_name: null, email: '' },
+      }
+      if (!assignmentsByProject[a.project_id]) assignmentsByProject[a.project_id] = []
+      assignmentsByProject[a.project_id].push(row)
+    }
 
     const mapped = (data || []).map((p: any) => ({
       ...p,
       recruiter_count: p.assignments?.[0]?.count || 0,
       hires_count: p.hires?.[0]?.count || 0,
-      assignment_rows: p.assignment_rows || [],
+      assignment_rows: assignmentsByProject[p.id] || [],
     }))
     setProjects(mapped)
     setLoading(false)
@@ -264,11 +295,21 @@ function AssignmentModal({
         recruiter_id: selectedRecruiter,
         individual_hire_goal: individualGoal || null,
       })
-      .select('id, recruiter_id, individual_hire_goal, recruiter:profiles!project_assignments_recruiter_id_fkey(id, first_name, last_name, email)')
+      .select('id, recruiter_id, individual_hire_goal')
       .single()
 
     if (!error && data) {
-      setAssignments(prev => [...prev, data as unknown as ProjectAssignmentRow])
+      const recruiter = allRecruiters.find(r => r.id === selectedRecruiter)
+      const row: ProjectAssignmentRow = {
+        ...data,
+        recruiter: {
+          id: selectedRecruiter,
+          first_name: recruiter?.first_name || null,
+          last_name: recruiter?.last_name || null,
+          email: recruiter?.email || '',
+        },
+      }
+      setAssignments(prev => [...prev, row])
       setSelectedRecruiter('')
       setIndividualGoal('')
     }

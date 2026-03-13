@@ -48,7 +48,7 @@ export default function OutreachPage() {
   const fetchEntries = async () => {
     let query = supabase
       .from('outbound_entries')
-      .select('*, recruiter:profiles!outbound_entries_recruiter_id_fkey(first_name, last_name, email)')
+      .select('*, recruiter:profiles!outbound_entries_recruiter_profile_fkey(first_name, last_name, email)')
       .order('week_start', { ascending: false })
       .limit(100)
 

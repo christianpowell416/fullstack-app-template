@@ -48,7 +48,7 @@ export default function PipelinePage() {
     // Fetch candidates
     let query = supabase
       .from('candidates')
-      .select('*, recruiter:profiles!candidates_recruiter_id_fkey(first_name, last_name)')
+      .select('*, recruiter:profiles!candidates_recruiter_profile_fkey(first_name, last_name)')
       .not('status', 'in', '(withdrawn)')
       .order('last_activity_date', { ascending: false })
 
