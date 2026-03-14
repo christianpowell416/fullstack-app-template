@@ -10,27 +10,27 @@ const config: Config = {
     extend: {
       colors: {
         // Mavericks brand
-        'accent': '#7052F5',
-        'accent-hover': '#5E3FE0',
+        'accent': 'var(--accent)',
+        'accent-hover': 'var(--accent-hover)',
         'green': '#76E59F',
         'green-hover': '#5CD88A',
 
-        // Dark mode
-        'dark-bg': '#1A191E',
-        'dark-card': '#232228',
-        'dark-border': '#2E2D35',
-        'dark-text': '#FFFFFF',
-        'dark-text-secondary': '#A29DB7',
+        // Theme-aware colors (driven by CSS variables)
+        'dark-bg': 'var(--dark-bg)',
+        'dark-card': 'var(--dark-card)',
+        'dark-border': 'var(--dark-border)',
+        'dark-text': 'var(--dark-text)',
+        'dark-text-secondary': 'var(--dark-text-secondary)',
 
         // Light purple surfaces
         'light-purple': '#F2EFFF',
 
         // Navigation
-        'nav-bg': '#151419',
-        'nav-border': '#2E2D35',
+        'nav-bg': 'var(--nav-bg)',
+        'nav-border': 'var(--nav-border)',
 
         // Admin background
-        'admin-bg': '#1A191E',
+        'admin-bg': 'var(--admin-bg)',
 
         // Status colors
         'success': '#76E59F',

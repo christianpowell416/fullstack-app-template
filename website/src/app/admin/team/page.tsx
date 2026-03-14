@@ -87,7 +87,7 @@ export default function TeamPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
         <div className="bg-dark-card rounded-2xl border border-dark-border p-3 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '50ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Team Size</p>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{teamSize}</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{teamSize}</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-3 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '100ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Total Hires</p>
@@ -99,7 +99,7 @@ export default function TeamPage() {
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-3 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '200ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Avg Interest Rate</p>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{avgInterestRate}%</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{avgInterestRate}%</p>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ export default function TeamPage() {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-heading font-semibold text-white text-base md:text-lg truncate">
+                <h3 className="font-heading font-semibold text-dark-text text-base md:text-lg truncate">
                   {getFullName(recruiter)}
                 </h3>
                 <p className="text-xs md:text-sm text-dark-text-secondary">{recruiter.email}</p>
@@ -132,15 +132,15 @@ export default function TeamPage() {
             <div className="grid grid-cols-2 gap-3 mb-4">
               <StatBox label="Hires" value={recruiter.total_hires.toString()} color="text-accent" />
               <StatBox label="Active Candidates" value={recruiter.active_candidates.toString()} color="text-green" />
-              <StatBox label="Total Outbound" value={recruiter.total_outbound.toLocaleString()} color="text-white" />
-              <StatBox label="Weekly Goal" value={recruiter.weekly_outbound_goal.toString()} color="text-white" />
+              <StatBox label="Total Outbound" value={recruiter.total_outbound.toLocaleString()} color="text-dark-text" />
+              <StatBox label="Weekly Goal" value={recruiter.weekly_outbound_goal.toString()} color="text-dark-text" />
             </div>
 
             {/* Interest rate bar */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-dark-text-secondary">Interest Rate</span>
-                <span className="text-xs font-heading font-bold text-white">{recruiter.interest_rate.toFixed(1)}%</span>
+                <span className="text-xs font-heading font-bold text-dark-text">{recruiter.interest_rate.toFixed(1)}%</span>
               </div>
               <div className="h-2 bg-dark-bg rounded-full overflow-hidden">
                 <div

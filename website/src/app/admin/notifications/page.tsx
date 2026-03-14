@@ -139,7 +139,7 @@ export default function NotificationsPage() {
                   <div className="w-2 h-2 bg-accent rounded-full mt-2 shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white">{notification.title}</p>
+                  <p className="text-sm font-medium text-dark-text">{notification.title}</p>
                   {notification.body && (
                     <p className="text-xs text-dark-text-secondary mt-1 line-clamp-2">
                       {notification.body}
@@ -162,7 +162,7 @@ export default function NotificationsPage() {
                     </button>
                     <button
                       onClick={() => passCandidate(notification)}
-                      className="px-3 py-1.5 bg-dark-bg text-dark-text-secondary text-xs rounded-lg hover:text-white border border-dark-border hover:border-dark-text-secondary transition-colors"
+                      className="px-3 py-1.5 bg-dark-bg text-dark-text-secondary text-xs rounded-lg hover:text-dark-text border border-dark-border hover:border-dark-text-secondary transition-colors"
                     >
                       Pass
                     </button>

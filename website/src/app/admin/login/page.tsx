@@ -49,14 +49,14 @@ function LoginForm() {
         {/* Logo */}
         <div className="text-center mb-8">
           <img src="/mavericks-logo.png" alt="Mavericks" className="w-20 h-20 rounded-2xl mb-6 shadow-glow mx-auto object-cover" />
-          <h1 className="text-3xl font-display text-white mb-2">Mavericks</h1>
+          <h1 className="text-3xl font-display text-dark-text mb-2">Mavericks</h1>
           <p className="text-dark-text-secondary font-heading">Internal Recruiting Platform</p>
         </div>
 
         {/* Login Card */}
         <div className="bg-dark-card rounded-3xl shadow-card border border-dark-border p-8">
           <div className="text-center mb-6">
-            <h2 className="text-lg font-heading font-semibold text-white mb-2">Sign In</h2>
+            <h2 className="text-lg font-heading font-semibold text-dark-text mb-2">Sign In</h2>
             <p className="text-dark-text-secondary text-sm">
               Enter your credentials to access the dashboard.
             </p>
@@ -80,7 +80,7 @@ function LoginForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-3 text-white placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-3 text-dark-text placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 placeholder="you@mavericksondemand.com"
               />
             </div>
@@ -96,7 +96,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-3 text-white placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-3 text-dark-text placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                 placeholder="Enter your password"
               />
             </div>

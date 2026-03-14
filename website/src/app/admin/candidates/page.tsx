@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/components/admin/AuthContext'
 import type { Candidate, CandidateStage, CandidateSource } from '@/lib/types'
@@ -9,10 +9,10 @@ import {
   PlusIcon,
   MagnifyingGlassIcon,
   ArrowDownTrayIcon,
-  ArrowUpTrayIcon,
-  FunnelIcon,
   XMarkIcon,
   ChevronUpDownIcon,
+  DocumentIcon,
+  ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline'
 
 type SortField = 'candidate_name' | 'company' | 'stage' | 'last_activity_date' | 'role'
@@ -175,7 +175,7 @@ export default function CandidatesPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search candidates..."
-            className="w-full bg-dark-card border border-dark-border rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent"
+            className="w-full bg-dark-card border border-dark-border rounded-xl pl-10 pr-4 py-2 text-sm text-dark-text placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent"
           />
         </div>
 
@@ -183,7 +183,7 @@ export default function CandidatesPage() {
         <select
           value={stageFilter}
           onChange={e => setStageFilter(e.target.value)}
-          className="bg-dark-card border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-accent"
+          className="bg-dark-card border border-dark-border rounded-xl px-3 py-2 text-sm text-dark-text focus:outline-none focus:border-accent"
         >
           <option value="all">All Stages</option>
           {[...PIPELINE_STAGES, 'rejected', 'withdrawn'].map(s => (
@@ -194,7 +194,7 @@ export default function CandidatesPage() {
         <select
           value={sourceFilter}
           onChange={e => setSourceFilter(e.target.value)}
-          className="bg-dark-card border border-dark-border rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-accent"
+          className="bg-dark-card border border-dark-border rounded-xl px-3 py-2 text-sm text-dark-text focus:outline-none focus:border-accent"
         >
           <option value="all">All Sources</option>
           {CANDIDATE_SOURCES.map(s => (
@@ -206,7 +206,7 @@ export default function CandidatesPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={exportCsv}
-            className="px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-sm text-dark-text-secondary hover:text-white transition-colors flex items-center gap-1.5"
+            className="px-3 py-2 bg-dark-card border border-dark-border rounded-xl text-sm text-dark-text-secondary hover:text-dark-text transition-colors flex items-center gap-1.5"
           >
             <ArrowDownTrayIcon className="w-4 h-4" />
             Export
@@ -229,64 +229,64 @@ export default function CandidatesPage() {
       <div className="overflow-x-auto bg-dark-card rounded-2xl border border-dark-border">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-dark-border">
+            <tr className="border-b-2 border-dark-border bg-dark-bg/50">
               <SortHeader label="Name" field="candidate_name" current={sortField} dir={sortDir} onSort={toggleSort} />
-              <th className="px-3 py-3 text-left text-xs font-medium text-dark-text-secondary">Title / Company</th>
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-dark-text-secondary uppercase tracking-wider">Title / Company</th>
               <SortHeader label="Role" field="role" current={sortField} dir={sortDir} onSort={toggleSort} />
               <SortHeader label="Stage" field="stage" current={sortField} dir={sortDir} onSort={toggleSort} />
-              <th className="px-3 py-3 text-left text-xs font-medium text-dark-text-secondary">Source</th>
-              {isAdmin && <th className="px-3 py-3 text-left text-xs font-medium text-dark-text-secondary">Recruiter</th>}
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-dark-text-secondary uppercase tracking-wider">Source</th>
+              {isAdmin && <th className="px-4 py-3.5 text-left text-xs font-semibold text-dark-text-secondary uppercase tracking-wider">Recruiter</th>}
               <SortHeader label="Last Activity" field="last_activity_date" current={sortField} dir={sortDir} onSort={toggleSort} />
-              <th className="px-3 py-3 text-left text-xs font-medium text-dark-text-secondary w-10" />
+              <th className="px-4 py-3.5 text-left text-xs font-semibold text-dark-text-secondary w-10" />
             </tr>
           </thead>
-          <tbody>
-            {filtered.map(c => (
+          <tbody className="divide-y divide-dark-border/40">
+            {filtered.map((c, i) => (
               <tr
                 key={c.id}
-                className="border-b border-dark-border/50 hover:bg-white/[0.02] cursor-pointer transition-colors"
+                className={`hover:bg-accent/[0.06] cursor-pointer transition-colors ${i % 2 === 1 ? 'bg-dark-bg/20' : ''}`}
                 onClick={() => { setEditingCandidate(c); setShowAddModal(true) }}
               >
-                <td className="px-3 py-2.5">
-                  <div>
-                    <span className="text-white font-medium">{c.candidate_name}</span>
+                <td className="px-4 py-3.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-dark-text font-medium">{c.candidate_name}</span>
                     {c.linkedin_url && (
                       <a
                         href={c.linkedin_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
-                        className="ml-1.5 text-[10px] text-blue-400 hover:text-blue-300"
+                        className="text-[10px] text-blue-400 hover:text-blue-300 font-medium"
                       >
                         LI
                       </a>
                     )}
                   </div>
                 </td>
-                <td className="px-3 py-2.5">
-                  <div className="text-xs text-dark-text-secondary">
-                    {c.title}{c.company ? ` @ ${c.company}` : ''}
+                <td className="px-4 py-3.5">
+                  <div className="text-xs text-dark-text">
+                    {c.title}{c.company ? <span className="text-dark-text-secondary"> @ {c.company}</span> : ''}
                   </div>
                 </td>
-                <td className="px-3 py-2.5 text-xs text-dark-text-secondary">{c.role}</td>
-                <td className="px-3 py-2.5">
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${stageColor(c.stage)}`}>
+                <td className="px-4 py-3.5 text-xs text-dark-text">{c.role}</td>
+                <td className="px-4 py-3.5">
+                  <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${stageColor(c.stage)}`}>
                     {STAGE_LABELS[c.stage] || c.stage}
                   </span>
                 </td>
-                <td className="px-3 py-2.5 text-xs text-dark-text-secondary">{c.source}</td>
+                <td className="px-4 py-3.5 text-xs text-dark-text-secondary">{c.source}</td>
                 {isAdmin && (
-                  <td className="px-3 py-2.5 text-xs text-dark-text-secondary">
+                  <td className="px-4 py-3.5 text-xs text-dark-text-secondary">
                     {(c.recruiter as any)?.first_name || '-'}
                   </td>
                 )}
-                <td className={`px-3 py-2.5 text-xs ${ageColor(c.last_activity_date)}`}>
+                <td className={`px-4 py-3.5 text-xs font-medium ${ageColor(c.last_activity_date)}`}>
                   {new Date(c.last_activity_date).toLocaleDateString()}
                 </td>
-                <td className="px-3 py-2.5">
+                <td className="px-4 py-3.5">
                   <button
                     onClick={e => { e.stopPropagation(); setEditingCandidate(c); setShowAddModal(true) }}
-                    className="text-dark-text-secondary hover:text-white transition-colors"
+                    className="text-dark-text-secondary hover:text-dark-text transition-colors"
                   >
                     ...
                   </button>
@@ -324,7 +324,7 @@ function SortHeader({ label, field, current, dir, onSort }: {
 }) {
   return (
     <th
-      className="px-3 py-3 text-left text-xs font-medium text-dark-text-secondary cursor-pointer hover:text-white transition-colors select-none"
+      className="px-4 py-3.5 text-left text-xs font-semibold text-dark-text-secondary uppercase tracking-wider cursor-pointer hover:text-dark-text transition-colors select-none"
       onClick={() => onSort(field)}
     >
       <span className="flex items-center gap-1">
@@ -348,6 +348,8 @@ function CandidateFormModal({
   const { user } = useAuth()
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
+  const [uploadingResume, setUploadingResume] = useState(false)
   const [form, setForm] = useState({
     candidate_name: candidate?.candidate_name || '',
     email: candidate?.email || '',
@@ -370,19 +372,54 @@ function CandidateFormModal({
 
   const set = (key: string, value: string) => setForm(f => ({ ...f, [key]: value }))
 
+  const uploadResume = async (candidateId: string): Promise<string | null> => {
+    if (!resumeFile) return null
+    setUploadingResume(true)
+    const ext = resumeFile.name.split('.').pop() || 'pdf'
+    const path = `${candidateId}/${Date.now()}.${ext}`
+    const { error } = await supabase.storage
+      .from('resumes')
+      .upload(path, resumeFile, { upsert: true })
+    setUploadingResume(false)
+    if (error) {
+      console.error('Resume upload failed:', error)
+      return null
+    }
+    return path
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
 
     if (candidate) {
+      // Upload resume if a new file was selected
+      let resumeUrl = candidate.resume_url
+      if (resumeFile) {
+        const path = await uploadResume(candidate.id)
+        if (path) resumeUrl = path
+      }
       await supabase
         .from('candidates')
-        .update(form)
+        .update({ ...form, resume_url: resumeUrl })
         .eq('id', candidate.id)
     } else {
-      await supabase
+      // Insert candidate first, then upload resume
+      const { data: newCandidate } = await supabase
         .from('candidates')
         .insert({ ...form, recruiter_id: user!.id })
+        .select('id')
+        .single()
+
+      if (newCandidate && resumeFile) {
+        const path = await uploadResume(newCandidate.id)
+        if (path) {
+          await supabase
+            .from('candidates')
+            .update({ resume_url: path })
+            .eq('id', newCandidate.id)
+        }
+      }
     }
 
     setSaving(false)
@@ -401,10 +438,10 @@ function CandidateFormModal({
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-dark-card rounded-3xl border border-dark-border p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-heading font-semibold text-white">
+          <h2 className="text-lg font-heading font-semibold text-dark-text">
             {candidate ? 'Edit Candidate' : 'Add Candidate'}
           </h2>
-          <button onClick={onClose} className="text-dark-text-secondary hover:text-white">
+          <button onClick={onClose} className="text-dark-text-secondary hover:text-dark-text">
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
@@ -488,6 +525,50 @@ function CandidateFormModal({
             <textarea value={form.additional_notes} onChange={e => set('additional_notes', e.target.value)} rows={2} className="form-input resize-none" />
           </FormField>
 
+          {/* Resume Upload */}
+          <FormField label="Resume">
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 px-3 py-2 bg-dark-bg border border-dark-border rounded-xl text-sm text-dark-text-secondary hover:text-dark-text hover:border-accent/50 transition-colors cursor-pointer">
+                <ArrowUpTrayIcon className="w-4 h-4" />
+                {resumeFile ? resumeFile.name : 'Choose file'}
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  className="hidden"
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) setResumeFile(file)
+                  }}
+                />
+              </label>
+              {candidate?.resume_url && !resumeFile && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const { data } = await supabase.storage
+                      .from('resumes')
+                      .createSignedUrl(candidate.resume_url!, 60)
+                    if (data?.signedUrl) window.open(data.signedUrl, '_blank')
+                  }}
+                  className="flex items-center gap-1.5 text-xs text-accent hover:text-accent-hover transition-colors"
+                >
+                  <DocumentIcon className="w-4 h-4" />
+                  View current
+                </button>
+              )}
+              {resumeFile && (
+                <button
+                  type="button"
+                  onClick={() => setResumeFile(null)}
+                  className="text-xs text-dark-text-secondary hover:text-error transition-colors"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            <p className="text-[10px] text-dark-text-secondary mt-1">PDF, DOC, or DOCX (max 10MB)</p>
+          </FormField>
+
           {/* Actions */}
           <div className="flex items-center gap-3 pt-2">
             {candidate && (
@@ -501,7 +582,7 @@ function CandidateFormModal({
               </button>
             )}
             <div className="flex-1" />
-            <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm text-dark-text-secondary border border-dark-border rounded-xl hover:text-white transition-colors">
+            <button type="button" onClick={onClose} className="px-4 py-2.5 text-sm text-dark-text-secondary border border-dark-border rounded-xl hover:text-dark-text transition-colors">
               Cancel
             </button>
             <button type="submit" disabled={saving} className="px-6 py-2.5 text-sm bg-accent text-white rounded-xl hover:bg-accent-hover transition-colors disabled:opacity-50">
@@ -518,7 +599,7 @@ function CandidateFormModal({
             border-radius: 0.75rem;
             padding: 0.5rem 0.75rem;
             font-size: 0.875rem;
-            color: white;
+            color: var(--dark-text);
           }
           .form-input:focus {
             outline: none;

@@ -164,7 +164,7 @@ function TrackerTab({ entries, onAdd, onEdit, userId, weeklyGoal }: {
             <PaperAirplaneIcon className="w-4 h-4 text-accent" />
             <p className="text-xs text-dark-text-secondary">This Week</p>
           </div>
-          <p className="text-2xl font-heading font-bold text-white">{thisWeekOutbound}</p>
+          <p className="text-2xl font-heading font-bold text-dark-text">{thisWeekOutbound}</p>
           <div className="mt-2">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] text-dark-text-secondary">Goal: {weeklyGoal}</span>
@@ -193,7 +193,7 @@ function TrackerTab({ entries, onAdd, onEdit, userId, weeklyGoal }: {
             <ArrowTrendingUpIcon className="w-4 h-4 text-yellow-400" />
             <p className="text-xs text-dark-text-secondary">All-Time Interest</p>
           </div>
-          <p className="text-2xl font-heading font-bold text-white">{overallInterestRate}%</p>
+          <p className="text-2xl font-heading font-bold text-dark-text">{overallInterestRate}%</p>
           <p className="text-[10px] text-dark-text-secondary mt-1">{totalInterested} / {totalOutbound} total</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn flex items-center justify-center" style={{ animationDelay: '200ms' }}>
@@ -211,15 +211,15 @@ function TrackerTab({ entries, onAdd, onEdit, userId, weeklyGoal }: {
 
       {/* Weekly Volume Chart */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '250ms' }}>
-        <h3 className="text-sm font-heading font-semibold text-white mb-3">Weekly Outbound Volume</h3>
+        <h3 className="text-sm font-heading font-semibold text-dark-text mb-3">Weekly Outbound Volume</h3>
         <div className="h-56 md:h-64">
           {weeklyData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E2D35" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#332F42" vertical={false} />
                 <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} />
                 <Bar dataKey="outbound" name="Outbound" radius={[4, 4, 0, 0]} fill="#7052F5" />
                 <Bar dataKey="interested" name="Interested" radius={[4, 4, 0, 0]} fill="#76E59F" />
               </BarChart>
@@ -235,13 +235,13 @@ function TrackerTab({ entries, onAdd, onEdit, userId, weeklyGoal }: {
       {/* Recent Entries */}
       {thisWeek.length > 0 && (
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '300ms' }}>
-          <h3 className="text-sm font-heading font-semibold text-white mb-3">This Week&apos;s Entries</h3>
+          <h3 className="text-sm font-heading font-semibold text-dark-text mb-3">This Week&apos;s Entries</h3>
           <div className="space-y-2">
             {thisWeek.map(e => (
               <div key={e.id} className="flex items-center justify-between bg-dark-bg rounded-xl p-3">
                 <div className="flex items-center gap-3">
                   <div className="text-xs">
-                    <span className="text-white font-medium">{e.outbound_count} outbound</span>
+                    <span className="text-dark-text font-medium">{e.outbound_count} outbound</span>
                     {e.interested_count != null && (
                       <span className="text-dark-text-secondary"> - {e.interested_count} interested</span>
                     )}
@@ -298,7 +298,7 @@ function HistoryTab({ entries, isAdmin, onEdit, onDelete }: {
           >
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="text-sm font-heading font-semibold text-white">
+                <h3 className="text-sm font-heading font-semibold text-dark-text">
                   Week of {new Date(weekStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </h3>
                 <p className="text-xs text-dark-text-secondary">
@@ -312,7 +312,7 @@ function HistoryTab({ entries, isAdmin, onEdit, onDelete }: {
                 <div key={e.id} className="flex items-center justify-between bg-dark-bg rounded-xl p-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-white font-medium">{e.outbound_count} outbound</span>
+                      <span className="text-dark-text font-medium">{e.outbound_count} outbound</span>
                       {e.interested_count != null && (
                         <span className="text-green">{e.interested_count} interested</span>
                       )}
@@ -434,7 +434,7 @@ function OutboundFormModal({
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-dark-card rounded-3xl border border-dark-border p-6 w-full max-w-md mx-4">
-        <h2 className="text-lg font-heading font-semibold text-white mb-4">
+        <h2 className="text-lg font-heading font-semibold text-dark-text mb-4">
           {entry ? 'Edit Outbound Entry' : 'Log Outbound'}
         </h2>
 
@@ -446,7 +446,7 @@ function OutboundFormModal({
               value={form.week_start}
               onChange={e => setForm({ ...form, week_start: e.target.value })}
               required
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
             />
           </div>
 
@@ -461,7 +461,7 @@ function OutboundFormModal({
                 value={form.outbound_count}
                 onChange={e => setForm({ ...form, outbound_count: parseInt(e.target.value) || 0 })}
                 required
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               />
             </div>
             <div>
@@ -471,7 +471,7 @@ function OutboundFormModal({
                 min={0}
                 value={form.interested_count}
                 onChange={e => setForm({ ...form, interested_count: parseInt(e.target.value) || 0 })}
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               />
             </div>
             <div>
@@ -481,7 +481,7 @@ function OutboundFormModal({
                 min={0}
                 value={form.emails_replied}
                 onChange={e => setForm({ ...form, emails_replied: parseInt(e.target.value) || 0 })}
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               />
             </div>
           </div>
@@ -491,7 +491,7 @@ function OutboundFormModal({
             <select
               value={form.source}
               onChange={e => setForm({ ...form, source: e.target.value as any })}
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
             >
               <option value="manual">Manual</option>
               <option value="linkedin_csv">LinkedIn CSV</option>
@@ -505,7 +505,7 @@ function OutboundFormModal({
               value={form.notes}
               onChange={e => setForm({ ...form, notes: e.target.value })}
               rows={2}
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent resize-none"
+              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent resize-none"
               placeholder="Optional notes..."
             />
           </div>
@@ -514,7 +514,7 @@ function OutboundFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 text-sm text-dark-text-secondary border border-dark-border rounded-xl hover:text-white hover:border-dark-text-secondary transition-colors"
+              className="flex-1 py-2.5 text-sm text-dark-text-secondary border border-dark-border rounded-xl hover:text-dark-text hover:border-dark-text-secondary transition-colors"
             >
               Cancel
             </button>

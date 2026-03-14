@@ -93,14 +93,14 @@ export default function ClientsPage() {
             <BuildingOfficeIcon className="w-4 h-4 md:w-5 md:h-5 text-accent" />
             <span className="text-xs md:text-sm text-dark-text-secondary">Clients</span>
           </div>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{totalClients}</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{totalClients}</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-3 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '100ms' }}>
           <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
             <BriefcaseIcon className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
             <span className="text-xs md:text-sm text-dark-text-secondary">Active Projects</span>
           </div>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{totalActiveProjects}</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{totalActiveProjects}</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-3 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '150ms' }}>
           <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
@@ -132,7 +132,7 @@ export default function ClientsPage() {
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <h3 className="font-heading font-semibold text-white text-sm md:text-base truncate">{client.client_name}</h3>
+                  <h3 className="font-heading font-semibold text-dark-text text-sm md:text-base truncate">{client.client_name}</h3>
                   <p className="text-xs text-dark-text-secondary">
                     {client.project_count} project{client.project_count !== 1 ? 's' : ''}
                   </p>
@@ -143,7 +143,7 @@ export default function ClientsPage() {
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-dark-bg rounded-xl p-3">
                   <p className="text-xs text-dark-text-secondary">Active Projects</p>
-                  <p className="text-lg font-heading font-bold text-white">{client.active_projects}</p>
+                  <p className="text-lg font-heading font-bold text-dark-text">{client.active_projects}</p>
                 </div>
                 <div className="bg-dark-bg rounded-xl p-3">
                   <p className="text-xs text-dark-text-secondary">Hires</p>
@@ -156,7 +156,7 @@ export default function ClientsPage() {
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-dark-text-secondary">Hire Goal Progress</span>
-                    <span className="text-xs font-heading text-white">{client.total_hires}/{client.total_hire_goal}</span>
+                    <span className="text-xs font-heading text-dark-text">{client.total_hires}/{client.total_hire_goal}</span>
                   </div>
                   <div className="h-1.5 bg-dark-bg rounded-full overflow-hidden">
                     <div
@@ -173,7 +173,7 @@ export default function ClientsPage() {
                 <div className="space-y-1.5">
                   {client.projects.slice(0, 3).map(p => (
                     <div key={p.id} className="flex items-center justify-between">
-                      <span className="text-xs text-white truncate">{p.name}</span>
+                      <span className="text-xs text-dark-text truncate">{p.name}</span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${statusColors[p.status] || ''}`}>
                         {p.status}
                       </span>

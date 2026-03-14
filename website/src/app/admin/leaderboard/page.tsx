@@ -87,7 +87,7 @@ export default function LeaderboardPage() {
           <button
             onClick={() => setTab('hires')}
             className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
-              tab === 'hires' ? 'bg-accent text-white' : 'text-dark-text-secondary hover:text-white'
+              tab === 'hires' ? 'bg-accent text-white' : 'text-dark-text-secondary hover:text-dark-text'
             }`}
           >
             Top Hires
@@ -95,7 +95,7 @@ export default function LeaderboardPage() {
           <button
             onClick={() => setTab('interest')}
             className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
-              tab === 'interest' ? 'bg-accent text-white' : 'text-dark-text-secondary hover:text-white'
+              tab === 'interest' ? 'bg-accent text-white' : 'text-dark-text-secondary hover:text-dark-text'
             }`}
           >
             Interest Rate
@@ -105,7 +105,7 @@ export default function LeaderboardPage() {
         {isAdmin && (
           <button
             onClick={toggleVisibility}
-            className="ml-auto text-xs text-dark-text-secondary hover:text-white transition-colors border border-dark-border rounded-lg px-3 py-1.5"
+            className="ml-auto text-xs text-dark-text-secondary hover:text-dark-text transition-colors border border-dark-border rounded-lg px-3 py-1.5"
           >
             {leaderboardPublic ? 'Hide from recruiters' : 'Show to recruiters'}
           </button>
@@ -148,7 +148,7 @@ export default function LeaderboardPage() {
                 {/* Name */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-white truncate">{r.recruiter_name}</span>
+                    <span className="text-sm font-medium text-dark-text truncate">{r.recruiter_name}</span>
                     {isCurrentUser && (
                       <span className="text-[10px] px-1.5 py-0.5 bg-accent/10 text-accent rounded-full">You</span>
                     )}
@@ -163,7 +163,7 @@ export default function LeaderboardPage() {
 
                 {/* Value */}
                 <div className="text-right shrink-0">
-                  <span className="text-lg font-heading font-bold text-white">
+                  <span className="text-lg font-heading font-bold text-dark-text">
                     {tab === 'hires' ? value : `${value.toFixed(1)}%`}
                   </span>
                   <p className="text-[10px] text-dark-text-secondary">

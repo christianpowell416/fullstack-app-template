@@ -143,7 +143,7 @@ export default function ProjectsPage() {
               {/* Header */}
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-white">{project.name}</h3>
+                  <h3 className="text-sm font-semibold text-dark-text">{project.name}</h3>
                   <p className="text-xs text-dark-text-secondary">{project.client_name}</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function ProjectsPage() {
                   {isAdmin && (
                     <button
                       onClick={() => { setEditingProject(project); setShowCreate(true) }}
-                      className="p-1 text-dark-text-secondary hover:text-white transition-colors"
+                      className="p-1 text-dark-text-secondary hover:text-dark-text transition-colors"
                     >
                       <PencilIcon className="w-3.5 h-3.5" />
                     </button>
@@ -341,10 +341,10 @@ function AssignmentModal({
       <div className="bg-dark-card rounded-3xl border border-dark-border p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-heading font-semibold text-white">Manage Recruiters</h2>
+            <h2 className="text-lg font-heading font-semibold text-dark-text">Manage Recruiters</h2>
             <p className="text-xs text-dark-text-secondary">{project.name}</p>
           </div>
-          <button onClick={() => { onSaved() }} className="p-1 text-dark-text-secondary hover:text-white transition-colors">
+          <button onClick={() => { onSaved() }} className="p-1 text-dark-text-secondary hover:text-dark-text transition-colors">
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
@@ -354,7 +354,7 @@ function AssignmentModal({
           <select
             value={selectedRecruiter}
             onChange={e => setSelectedRecruiter(e.target.value)}
-            className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent appearance-none"
+            className="flex-1 bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent appearance-none"
           >
             <option value="">Select recruiter...</option>
             {availableRecruiters.map(r => (
@@ -367,7 +367,7 @@ function AssignmentModal({
             placeholder="Goal"
             value={individualGoal}
             onChange={e => setIndividualGoal(e.target.value ? parseInt(e.target.value) : '')}
-            className="w-20 bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+            className="w-20 bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
           />
           <button
             onClick={handleAssign}
@@ -394,7 +394,7 @@ function AssignmentModal({
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-white truncate">{getFullName(a.recruiter)}</p>
+                <p className="text-sm text-dark-text truncate">{getFullName(a.recruiter)}</p>
                 <p className="text-[10px] text-dark-text-secondary">{a.recruiter.email}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -404,7 +404,7 @@ function AssignmentModal({
                   placeholder="Goal"
                   value={a.individual_hire_goal || ''}
                   onChange={e => handleUpdateGoal(a.id, e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-16 bg-dark-card border border-dark-border rounded-lg px-2 py-1 text-xs text-white text-center focus:outline-none focus:border-accent"
+                  className="w-16 bg-dark-card border border-dark-border rounded-lg px-2 py-1 text-xs text-dark-text text-center focus:outline-none focus:border-accent"
                 />
                 <button
                   onClick={() => handleRemove(a.id)}
@@ -475,7 +475,7 @@ function ProjectFormModal({
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-dark-card rounded-3xl border border-dark-border p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-heading font-semibold text-white mb-4">
+        <h2 className="text-lg font-heading font-semibold text-dark-text mb-4">
           {project ? 'Edit Project' : 'New Project'}
         </h2>
 
@@ -486,7 +486,7 @@ function ProjectFormModal({
               value={form.name}
               onChange={e => setForm({ ...form, name: e.target.value })}
               required
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               placeholder="e.g., Vanta PM Recruiting"
             />
           </FormField>
@@ -497,7 +497,7 @@ function ProjectFormModal({
               value={form.client_name}
               onChange={e => setForm({ ...form, client_name: e.target.value })}
               required
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               placeholder="e.g., Vanta"
             />
           </FormField>
@@ -507,7 +507,7 @@ function ProjectFormModal({
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
               rows={2}
-              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent resize-none"
+              className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent resize-none"
               placeholder="Brief project description..."
             />
           </FormField>
@@ -519,7 +519,7 @@ function ProjectFormModal({
                 value={form.start_date}
                 onChange={e => setForm({ ...form, start_date: e.target.value })}
                 required
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               />
             </FormField>
             <FormField label="End Date" required>
@@ -528,7 +528,7 @@ function ProjectFormModal({
                 value={form.end_date}
                 onChange={e => setForm({ ...form, end_date: e.target.value })}
                 required
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               />
             </FormField>
           </div>
@@ -541,7 +541,7 @@ function ProjectFormModal({
                 value={form.hire_goal}
                 onChange={e => setForm({ ...form, hire_goal: parseInt(e.target.value) || 1 })}
                 required
-                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
               />
             </FormField>
             {project && (
@@ -549,7 +549,7 @@ function ProjectFormModal({
                 <select
                   value={form.status}
                   onChange={e => setForm({ ...form, status: e.target.value as any })}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-accent"
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-3 py-2.5 text-sm text-dark-text focus:outline-none focus:border-accent"
                 >
                   <option value="active">Active</option>
                   <option value="completed">Completed</option>
@@ -564,7 +564,7 @@ function ProjectFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 text-sm text-dark-text-secondary border border-dark-border rounded-xl hover:text-white hover:border-dark-text-secondary transition-colors"
+              className="flex-1 py-2.5 text-sm text-dark-text-secondary border border-dark-border rounded-xl hover:text-dark-text hover:border-dark-text-secondary transition-colors"
             >
               Cancel
             </button>

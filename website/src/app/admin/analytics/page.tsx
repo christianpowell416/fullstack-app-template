@@ -169,7 +169,7 @@ function PerformanceTab({ snapshots, recruiterPerf, candidates, isAdmin }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '50ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Total in Pipeline</p>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{totalInPipeline}</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{totalInPipeline}</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '100ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Active Candidates</p>
@@ -181,13 +181,13 @@ function PerformanceTab({ snapshots, recruiterPerf, candidates, isAdmin }: {
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '200ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Offer Acceptance</p>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{avgOfferAcceptance}%</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{avgOfferAcceptance}%</p>
         </div>
       </div>
 
       {/* Hires Trend Chart */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '250ms' }}>
-        <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-3 md:mb-4">Weekly Hires Trend</h3>
+        <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-3 md:mb-4">Weekly Hires Trend</h3>
         <div className="h-48 md:h-64">
           {weeklyHires.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -198,10 +198,10 @@ function PerformanceTab({ snapshots, recruiterPerf, candidates, isAdmin }: {
                     <stop offset="95%" stopColor="#76E59F" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E2D35" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#332F42" />
                 <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} />
                 <Area type="monotone" dataKey="hires" stroke="#76E59F" strokeWidth={2} fill="url(#hiresGrad)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -215,7 +215,7 @@ function PerformanceTab({ snapshots, recruiterPerf, candidates, isAdmin }: {
 
       {/* Pipeline Distribution */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '300ms' }}>
-        <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-3 md:mb-4">Pipeline Distribution</h3>
+        <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-3 md:mb-4">Pipeline Distribution</h3>
         <div className="h-48 md:h-64">
           <PipelineDistribution candidates={candidates} />
         </div>
@@ -224,7 +224,7 @@ function PerformanceTab({ snapshots, recruiterPerf, candidates, isAdmin }: {
       {/* Recruiter Leaderboard (admin only) */}
       {isAdmin && recruiterPerf.length > 0 && (
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '350ms' }}>
-          <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-4 md:mb-6">Recruiter Leaderboard</h3>
+          <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-4 md:mb-6">Recruiter Leaderboard</h3>
           <div className="space-y-3 md:space-y-4">
             {[...recruiterPerf].sort((a, b) => b.total_hires - a.total_hires).map((r, i) => {
               const maxHires = recruiterPerf.reduce((m, rp) => Math.max(m, rp.total_hires), 1)
@@ -236,7 +236,7 @@ function PerformanceTab({ snapshots, recruiterPerf, candidates, isAdmin }: {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs md:text-sm font-medium text-white truncate">{r.recruiter_name}</span>
+                      <span className="text-xs md:text-sm font-medium text-dark-text truncate">{r.recruiter_name}</span>
                       <span className="text-xs font-heading text-dark-text-secondary shrink-0 ml-2">{r.active_candidates} active</span>
                     </div>
                     <div className="h-6 md:h-8 bg-dark-bg rounded-lg overflow-hidden">
@@ -267,10 +267,10 @@ function PipelineDistribution({ candidates }: { candidates: { stage: string; sta
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#2E2D35" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#332F42" vertical={false} />
         <XAxis dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 10 }} angle={-30} textAnchor="end" height={50} />
         <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} allowDecimals={false} />
-        <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} />
+        <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} />
         <Bar dataKey="count" radius={[4, 4, 0, 0]} fill="#7052F5" />
       </BarChart>
     </ResponsiveContainer>
@@ -314,7 +314,7 @@ function OutboundTab({ outboundEntries }: { outboundEntries: OutboundWeek[] }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '50ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Total Outbound</p>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{totalOutbound.toLocaleString()}</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{totalOutbound.toLocaleString()}</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '100ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Interested</p>
@@ -326,21 +326,21 @@ function OutboundTab({ outboundEntries }: { outboundEntries: OutboundWeek[] }) {
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '200ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1">Reply Rate</p>
-          <p className="text-xl md:text-2xl font-heading font-bold text-white">{overallReplyRate}%</p>
+          <p className="text-xl md:text-2xl font-heading font-bold text-dark-text">{overallReplyRate}%</p>
         </div>
       </div>
 
       {/* Outbound Volume Chart */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '250ms' }}>
-        <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-3 md:mb-4">Weekly Outbound Volume</h3>
+        <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-3 md:mb-4">Weekly Outbound Volume</h3>
         <div className="h-48 md:h-64">
           {weeklyOutbound.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyOutbound}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E2D35" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#332F42" vertical={false} />
                 <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} />
                 <Bar dataKey="outbound" name="Outbound" radius={[4, 4, 0, 0]} fill="#7052F5" />
                 <Bar dataKey="interested" name="Interested" radius={[4, 4, 0, 0]} fill="#76E59F" />
               </BarChart>
@@ -355,15 +355,15 @@ function OutboundTab({ outboundEntries }: { outboundEntries: OutboundWeek[] }) {
 
       {/* Interest Rate Trend */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '300ms' }}>
-        <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-3 md:mb-4">Interest Rate Trend</h3>
+        <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-3 md:mb-4">Interest Rate Trend</h3>
         <div className="h-48 md:h-64">
           {weeklyOutbound.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={weeklyOutbound}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E2D35" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#332F42" />
                 <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} unit="%" />
-                <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} formatter={(v: number) => [`${v}%`, 'Interest Rate']} />
+                <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} formatter={(v: number) => [`${v}%`, 'Interest Rate']} />
                 <Line type="monotone" dataKey="interestRate" stroke="#7052F5" strokeWidth={2} dot={{ r: 4, fill: '#7052F5' }} />
               </LineChart>
             </ResponsiveContainer>
@@ -448,23 +448,23 @@ function ConversionsTab({ candidates, snapshots }: {
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '200ms' }}>
           <p className="text-xs md:text-sm text-dark-text-secondary mb-1 md:mb-2">In Final Rounds</p>
-          <p className="text-2xl md:text-3xl font-heading font-bold text-white">{inFinalRound + inThirdRound}</p>
+          <p className="text-2xl md:text-3xl font-heading font-bold text-dark-text">{inFinalRound + inThirdRound}</p>
           <p className="text-[10px] md:text-xs text-dark-text-secondary mt-1">~{projectedFromFinal + projectedFromThird} projected hires</p>
         </div>
       </div>
 
       {/* Conversion Rates */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '250ms' }}>
-        <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-3 md:mb-4">Stage-to-Stage Conversion Rates</h3>
+        <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-3 md:mb-4">Stage-to-Stage Conversion Rates</h3>
         <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3 md:gap-4">
           {conversions.map(c => (
             <div key={c.to} className="text-center">
               <div className="relative w-14 h-14 md:w-16 md:h-16 mx-auto mb-2">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2E2D35" strokeWidth="3" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#332F42" strokeWidth="3" />
                   <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#7052F5" strokeWidth="3" strokeDasharray={`${c.rate}, 100`} />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] md:text-xs font-heading font-bold text-white">{c.rate}%</span>
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] md:text-xs font-heading font-bold text-dark-text">{c.rate}%</span>
               </div>
               <p className="text-[10px] text-dark-text-secondary leading-tight">{c.from} to {c.to}</p>
             </div>
@@ -475,14 +475,14 @@ function ConversionsTab({ candidates, snapshots }: {
       {/* Conversion Trend */}
       {weeklyConversions.length > 0 && (
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 md:p-6 opacity-0 animate-fadeIn" style={{ animationDelay: '300ms' }}>
-          <h3 className="text-base md:text-lg font-heading font-semibold text-white mb-3 md:mb-4">Conversion Rate Trends</h3>
+          <h3 className="text-base md:text-lg font-heading font-semibold text-dark-text mb-3 md:mb-4">Conversion Rate Trends</h3>
           <div className="h-48 md:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={weeklyConversions}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2E2D35" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#332F42" />
                 <XAxis dataKey="week" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} unit="%" />
-                <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} />
+                <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} />
                 <Line type="monotone" dataKey="screenToSubmit" name="Screen to Submit" stroke="#7052F5" strokeWidth={2} dot={{ r: 3 }} />
                 <Line type="monotone" dataKey="offerAcceptance" name="Offer Acceptance" stroke="#76E59F" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>

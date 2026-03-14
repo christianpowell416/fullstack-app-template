@@ -80,7 +80,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     )
 
     return () => subscription.unsubscribe()
-  }, [supabase, router, pathname])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isLoading) {
     return (

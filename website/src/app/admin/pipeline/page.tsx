@@ -107,7 +107,7 @@ export default function PipelinePage() {
   if (loading) return (
     <div className="p-3 md:p-6 lg:p-8 max-w-full mx-auto">
       <div className="flex gap-4">
-        {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-60 md:w-72 h-96 shrink-0 bg-dark-border/50 rounded-2xl animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-dark-border/50 via-dark-card to-dark-border/50" />)}
+        {[1, 2, 3, 4, 5].map(i => <div key={i} className="w-40 md:w-44 h-96 shrink-0 bg-dark-border/50 rounded-2xl animate-shimmer bg-[length:200%_100%] bg-gradient-to-r from-dark-border/50 via-dark-card to-dark-border/50" />)}
       </div>
     </div>
   )
@@ -123,7 +123,7 @@ export default function PipelinePage() {
             placeholder="Search candidates..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 md:py-2.5 bg-dark-card border border-dark-border rounded-xl text-white text-sm placeholder-dark-text-secondary focus:outline-none focus:border-accent transition-colors"
+            className="w-full pl-9 pr-4 py-2 md:py-2.5 bg-dark-card border border-dark-border rounded-xl text-dark-text text-sm placeholder-dark-text-secondary focus:outline-none focus:border-accent transition-colors"
           />
         </div>
 
@@ -132,7 +132,7 @@ export default function PipelinePage() {
             <select
               value={projectFilter}
               onChange={e => setProjectFilter(e.target.value)}
-              className="w-full appearance-none pl-3 pr-8 py-2 md:py-2.5 bg-dark-card border border-dark-border rounded-xl text-sm text-white focus:outline-none focus:border-accent transition-colors cursor-pointer"
+              className="w-full appearance-none pl-3 pr-8 py-2 md:py-2.5 bg-dark-card border border-dark-border rounded-xl text-sm text-dark-text focus:outline-none focus:border-accent transition-colors cursor-pointer"
             >
               <option value="">All Projects</option>
               {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -145,7 +145,7 @@ export default function PipelinePage() {
               <select
                 value={recruiterFilter}
                 onChange={e => setRecruiterFilter(e.target.value)}
-                className="w-full appearance-none pl-3 pr-8 py-2 md:py-2.5 bg-dark-card border border-dark-border rounded-xl text-sm text-white focus:outline-none focus:border-accent transition-colors cursor-pointer"
+                className="w-full appearance-none pl-3 pr-8 py-2 md:py-2.5 bg-dark-card border border-dark-border rounded-xl text-sm text-dark-text focus:outline-none focus:border-accent transition-colors cursor-pointer"
               >
                 <option value="">All Recruiters</option>
                 {recruiters.map(r => <option key={r.id} value={r.id}>{r.first_name} {r.last_name}</option>)}
@@ -188,7 +188,7 @@ function KanbanView({ candidates, onStageChange }: {
         return (
           <div
             key={stage}
-            className="flex-shrink-0 w-56 md:w-64 opacity-0 animate-fadeIn"
+            className="flex-shrink-0 w-40 md:w-44 opacity-0 animate-fadeIn"
             style={{ animationDelay: `${150 + stageIdx * 40}ms` }}
             onDragOver={e => e.preventDefault()}
             onDrop={() => handleDrop(stage)}
@@ -196,7 +196,7 @@ function KanbanView({ candidates, onStageChange }: {
             {/* Column Header */}
             <div className={`flex items-center gap-2 mb-3 px-3 py-2 rounded-xl ${colors.bg}`}>
               <div className={`w-2.5 h-2.5 rounded-full ${colors.dot}`} />
-              <span className="font-heading font-semibold text-white text-xs">{STAGE_LABELS[stage]}</span>
+              <span className="font-heading font-semibold text-dark-text text-xs">{STAGE_LABELS[stage]}</span>
               <span className="ml-auto text-[10px] font-heading text-dark-text-secondary bg-dark-bg px-2 py-0.5 rounded-full">{stageCandidates.length}</span>
             </div>
 
@@ -209,7 +209,7 @@ function KanbanView({ candidates, onStageChange }: {
                   onDragStart={() => handleDragStart(candidate.id)}
                   className={`bg-dark-card rounded-xl border-l-2 ${colors.border} border border-dark-border p-3 hover:border-accent/30 transition-all cursor-grab active:cursor-grabbing group`}
                 >
-                  <h3 className="font-heading font-semibold text-white text-xs group-hover:text-accent transition-colors">{candidate.candidate_name}</h3>
+                  <h3 className="font-heading font-semibold text-dark-text text-xs group-hover:text-accent transition-colors">{candidate.candidate_name}</h3>
                   <p className="text-[10px] text-accent mt-0.5">{candidate.role}</p>
                   <p className="text-[10px] text-dark-text-secondary">
                     {candidate.title}{candidate.company ? ` @ ${candidate.company}` : ''}
@@ -281,7 +281,7 @@ function FunnelView({ candidates }: { candidates: Candidate[] }) {
       {/* Summary Cards */}
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 text-center">
-          <p className="text-2xl font-heading font-bold text-white">{totalCandidates}</p>
+          <p className="text-2xl font-heading font-bold text-dark-text">{totalCandidates}</p>
           <p className="text-xs text-dark-text-secondary">Total in Pipeline</p>
         </div>
         <div className="bg-dark-card rounded-2xl border border-dark-border p-4 text-center">
@@ -296,13 +296,13 @@ function FunnelView({ candidates }: { candidates: Candidate[] }) {
 
       {/* Funnel Bar Chart */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-5">
-        <h3 className="text-sm font-heading font-semibold text-white mb-4">Pipeline Funnel</h3>
+        <h3 className="text-sm font-heading font-semibold text-dark-text mb-4">Pipeline Funnel</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={stageCounts} layout="vertical">
               <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} />
               <YAxis type="category" dataKey="stage" axisLine={false} tickLine={false} tick={{ fill: '#A29DB7', fontSize: 11 }} width={90} />
-              <Tooltip contentStyle={{ backgroundColor: '#232228', border: '1px solid #2E2D35', borderRadius: '12px', color: '#fff' }} />
+              <Tooltip contentStyle={{ backgroundColor: '#3A374A', border: '1px solid #332F42', borderRadius: '12px', color: '#fff' }} />
               <Bar dataKey="count" radius={[0, 6, 6, 0]} fill="#7052F5" />
             </BarChart>
           </ResponsiveContainer>
@@ -311,16 +311,16 @@ function FunnelView({ candidates }: { candidates: Candidate[] }) {
 
       {/* Conversion Rates */}
       <div className="bg-dark-card rounded-2xl border border-dark-border p-5">
-        <h3 className="text-sm font-heading font-semibold text-white mb-4">Stage-to-Stage Conversion Rates</h3>
+        <h3 className="text-sm font-heading font-semibold text-dark-text mb-4">Stage-to-Stage Conversion Rates</h3>
         <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3">
           {conversions.map(c => (
             <div key={c.to} className="text-center">
               <div className="relative w-14 h-14 mx-auto mb-2">
                 <svg className="w-14 h-14 -rotate-90" viewBox="0 0 36 36">
-                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2E2D35" strokeWidth="3" />
+                  <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#332F42" strokeWidth="3" />
                   <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#7052F5" strokeWidth="3" strokeDasharray={`${c.rate}, 100`} />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-heading font-bold text-white">{c.rate}%</span>
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-heading font-bold text-dark-text">{c.rate}%</span>
               </div>
               <p className="text-[10px] text-dark-text-secondary leading-tight">{c.from} to {c.to}</p>
             </div>

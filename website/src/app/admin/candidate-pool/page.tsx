@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { useAuth } from '@/components/admin/AuthContext'
 import type { Candidate, CandidateClaim } from '@/lib/types'
-import { UserPlusIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline'
+import { UserPlusIcon, MagnifyingGlassIcon, FunnelIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 
 export default function CandidatePoolPage() {
   const [candidates, setCandidates] = useState<(Candidate & { claims?: CandidateClaim[] })[]>([])
@@ -19,7 +19,8 @@ export default function CandidatePoolPage() {
   }, [])
 
   const fetchRejectedCandidates = async () => {
-    const { data } = await supabase
+    // Exclude candidates rejected by the current user - they don't need to act on their own
+    let query = supabase
       .from('candidates')
       .select(`
         *,
@@ -29,6 +30,11 @@ export default function CandidatePoolPage() {
       .eq('status', 'rejected')
       .order('updated_at', { ascending: false })
 
+    if (user) {
+      query = query.neq('recruiter_id', user.id)
+    }
+
+    const { data } = await query
     setCandidates((data || []) as any)
     setLoading(false)
   }
@@ -66,17 +72,26 @@ export default function CandidatePoolPage() {
     fetchRejectedCandidates()
   }
 
-  const filteredCandidates = candidates.filter(c => {
-    if (!search) return true
-    const q = search.toLowerCase()
-    return (
-      c.candidate_name.toLowerCase().includes(q) ||
-      c.company?.toLowerCase().includes(q) ||
-      c.title?.toLowerCase().includes(q) ||
-      c.role.toLowerCase().includes(q) ||
-      c.school?.toLowerCase().includes(q)
-    )
-  })
+  const filteredCandidates = candidates
+    .filter(c => {
+      if (!search) return true
+      const q = search.toLowerCase()
+      return (
+        c.candidate_name.toLowerCase().includes(q) ||
+        c.company?.toLowerCase().includes(q) ||
+        c.title?.toLowerCase().includes(q) ||
+        c.role.toLowerCase().includes(q) ||
+        c.school?.toLowerCase().includes(q)
+      )
+    })
+    // Sort unactioned candidates first
+    .sort((a, b) => {
+      const aActioned = hasUserActioned(a) ? 1 : 0
+      const bActioned = hasUserActioned(b) ? 1 : 0
+      return aActioned - bActioned
+    })
+
+  const unactionedCount = filteredCandidates.filter(c => !hasUserActioned(c)).length
 
   const hasUserActioned = (candidate: Candidate & { claims?: CandidateClaim[] }) => {
     return candidate.claims?.some(cl => cl.recruiter_id === user?.id)
@@ -100,6 +115,16 @@ export default function CandidatePoolPage() {
 
   return (
     <div className="p-4 md:p-6">
+      {/* Unactioned banner */}
+      {unactionedCount > 0 && (
+        <div className="flex items-center gap-3 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl px-4 py-3 mb-4">
+          <ExclamationTriangleIcon className="w-5 h-5 text-yellow-400 shrink-0" />
+          <p className="text-xs text-yellow-400">
+            <span className="font-semibold">{unactionedCount}</span> candidate{unactionedCount !== 1 ? 's' : ''} require your review. Please claim or pass on each.
+          </p>
+        </div>
+      )}
+
       {/* Search */}
       <div className="mb-6">
         <div className="relative max-w-md">
@@ -109,7 +134,7 @@ export default function CandidatePoolPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, company, role, school..."
-            className="w-full bg-dark-card border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent transition-colors"
+            className="w-full bg-dark-card border border-dark-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-dark-text placeholder-dark-text-secondary/50 focus:outline-none focus:border-accent transition-colors"
           />
         </div>
         <p className="text-xs text-dark-text-secondary mt-2">
@@ -141,7 +166,7 @@ export default function CandidatePoolPage() {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-white">{candidate.candidate_name}</h3>
+                    <h3 className="text-sm font-semibold text-dark-text">{candidate.candidate_name}</h3>
                     <p className="text-xs text-dark-text-secondary mt-0.5">
                       {candidate.title}{candidate.company ? ` at ${candidate.company}` : ''}
                     </p>
@@ -167,17 +192,32 @@ export default function CandidatePoolPage() {
                   )}
                 </div>
 
-                {/* LinkedIn */}
-                {candidate.linkedin_url && (
-                  <a
-                    href={candidate.linkedin_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors block mb-3"
-                  >
-                    View LinkedIn Profile
-                  </a>
-                )}
+                {/* Links */}
+                <div className="flex items-center gap-3 mb-3">
+                  {candidate.linkedin_url && (
+                    <a
+                      href={candidate.linkedin_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      View LinkedIn
+                    </a>
+                  )}
+                  {candidate.resume_url && (
+                    <button
+                      onClick={async () => {
+                        const { data } = await supabase.storage
+                          .from('resumes')
+                          .createSignedUrl(candidate.resume_url!, 60)
+                        if (data?.signedUrl) window.open(data.signedUrl, '_blank')
+                      }}
+                      className="text-[10px] text-accent hover:text-accent-hover transition-colors"
+                    >
+                      View Resume
+                    </button>
+                  )}
+                </div>
 
                 {/* Notes preview */}
                 {candidate.notes && (
@@ -199,7 +239,7 @@ export default function CandidatePoolPage() {
                     </button>
                     <button
                       onClick={() => passCandidate(candidate.id)}
-                      className="flex-1 px-3 py-2 bg-dark-bg text-dark-text-secondary text-xs rounded-lg hover:text-white border border-dark-border hover:border-dark-text-secondary transition-colors"
+                      className="flex-1 px-3 py-2 bg-dark-bg text-dark-text-secondary text-xs rounded-lg hover:text-dark-text border border-dark-border hover:border-dark-text-secondary transition-colors"
                     >
                       Pass
                     </button>
@@ -218,7 +258,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-2">
       <span className="text-[10px] text-dark-text-secondary w-16 shrink-0">{label}</span>
-      <span className="text-xs text-white">{value}</span>
+      <span className="text-xs text-dark-text">{value}</span>
     </div>
   )
 }

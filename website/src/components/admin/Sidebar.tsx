@@ -2,15 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePageTitle } from './PageTitleContext'
 import { useAuth } from './AuthContext'
+import { useTheme } from './ThemeContext'
+import { useSidebar } from './SidebarContext'
 import { createClient } from '@/lib/supabase-client'
 import { getInitials, getFullName } from '@/lib/types'
 import {
   ChartBarIcon,
   SparklesIcon,
-  BuildingOfficeIcon,
   UsersIcon,
   ChevronRightIcon,
   ArrowRightOnRectangleIcon,
@@ -19,6 +20,10 @@ import {
   ClipboardDocumentListIcon,
   TrophyIcon,
   ArrowUpTrayIcon,
+  SunIcon,
+  MoonIcon,
+  ChevronDoubleRightIcon,
+  ChevronDoubleLeftIcon,
 } from '@heroicons/react/24/outline'
 
 // Funnel icon as inline SVG since heroicons doesn't have one
@@ -30,21 +35,23 @@ function FunnelIcon({ className }: { className?: string }) {
   )
 }
 
-// Tooltip component
-function Tooltip({ children, label }: { children: React.ReactNode; label: string }) {
-  const [show, setShow] = useState(false)
+// Tooltip - only shows in collapsed mode
+function Tooltip({ children, label, show }: { children: React.ReactNode; label: string; show: boolean }) {
+  const [hover, setHover] = useState(false)
+
+  if (!show) return <>{children}</>
 
   return (
     <div
       className="relative"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       {children}
-      {show && (
+      {hover && (
         <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-[100] pointer-events-none">
           <div className="bg-dark-card border border-dark-border rounded-lg px-3 py-1.5 shadow-lg whitespace-nowrap">
-            <span className="text-sm text-white">{label}</span>
+            <span className="text-sm text-dark-text">{label}</span>
           </div>
         </div>
       )}
@@ -63,12 +70,21 @@ const navigation = [
   { name: 'Import', href: '/import', icon: ArrowUpTrayIcon, adminOnly: true },
 ]
 
+// Fixed icon column width: matches collapsed sidebar (w-12 = 48px, md:w-16 = 64px)
+// We use 64px as the icon column since the sidebar is always md:w-16 on desktop
+const ICON_COL = 'w-12 md:w-16 shrink-0 flex items-center justify-center'
+
 export default function Sidebar() {
   const rawPathname = usePathname()
   const [showMenu, setShowMenu] = useState(false)
+  const [menuPos, setMenuPos] = useState<{ bottom: number; left: number } | null>(null)
   const [mounted, setMounted] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [poolCount, setPoolCount] = useState(0)
+  const userBtnRef = useRef<HTMLButtonElement>(null)
   const { user, isAdmin } = useAuth()
+  const { theme, toggleTheme } = useTheme()
+  const { expanded, toggleSidebar } = useSidebar()
   const supabase = createClient()
 
   useEffect(() => { setMounted(true) }, [])
@@ -88,13 +104,50 @@ export default function Sidebar() {
 
     fetchUnread()
 
-    // Subscribe to new notifications
     const channel = supabase
       .channel('notifications')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'notifications', filter: `recipient_id=eq.${user.id}` },
         () => { setUnreadCount(prev => prev + 1) }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [user, supabase])
+
+  // Fetch unactioned candidate pool count
+  useEffect(() => {
+    if (!user) return
+
+    const fetchPoolCount = async () => {
+      const { count: totalRejected } = await supabase
+        .from('candidates')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'rejected')
+        .neq('recruiter_id', user.id)
+
+      const { count: userClaims } = await supabase
+        .from('candidate_claims')
+        .select('*', { count: 'exact', head: true })
+        .eq('recruiter_id', user.id)
+
+      setPoolCount(Math.max(0, (totalRejected || 0) - (userClaims || 0)))
+    }
+
+    fetchPoolCount()
+
+    const channel = supabase
+      .channel('pool-badge')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'candidates' },
+        () => { fetchPoolCount() }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'candidate_claims' },
+        () => { fetchPoolCount() }
       )
       .subscribe()
 
@@ -110,7 +163,6 @@ export default function Sidebar() {
     window.location.href = `${basePath}/login`
   }
 
-  // Filter navigation based on role
   const visibleNavigation = navigation.filter(item => !item.adminOnly || isAdmin)
 
   const getPageInfo = (): { title: string; breadcrumbs: { label: string; href: string }[] } => {
@@ -157,31 +209,48 @@ export default function Sidebar() {
   const userName = user ? getFullName(user) : 'User'
   const userRoleLabel = isAdmin ? 'Admin' : 'Recruiter'
 
+  const sidebarWidth = expanded ? 'w-56' : 'w-12 md:w-16'
+  const topBarLeft = expanded ? 'left-56' : 'left-12 md:left-16'
+
+  const handleUserMenuClick = () => {
+    if (!showMenu && userBtnRef.current) {
+      const rect = userBtnRef.current.getBoundingClientRect()
+      setMenuPos({
+        bottom: window.innerHeight - rect.top + 4,
+        left: rect.right + 8,
+      })
+    }
+    setShowMenu(!showMenu)
+  }
+
   if (!mounted) return (
     <>
-      <div className="fixed top-0 left-12 md:left-16 right-0 h-16 bg-nav-bg/80 backdrop-blur-xl border-b border-nav-border z-40" />
-      <div className="fixed top-0 bottom-0 left-0 w-12 md:w-16 bg-nav-bg z-50 border-r border-nav-border" />
+      <div className={`fixed top-0 ${topBarLeft} right-0 h-16 bg-nav-bg border-b border-nav-border z-40`} />
+      <div className={`fixed top-0 bottom-0 left-0 ${sidebarWidth} bg-nav-bg z-50 border-r border-nav-border`} />
     </>
   )
 
   return (
     <>
       {/* Top Bar */}
-      <div className="fixed top-0 left-12 md:left-16 right-0 h-16 bg-nav-bg/80 backdrop-blur-xl border-b border-nav-border z-40 flex items-center px-4 md:px-8">
+      <div
+        className={`fixed top-0 right-0 h-16 bg-nav-bg border-b border-nav-border z-40 flex items-center px-4 md:px-8 transition-[left] duration-200 ${expanded ? '' : 'left-12 md:left-16'}`}
+        style={expanded ? { left: '14rem' } : undefined}
+      >
         {/* Left - Title */}
         <div className="flex items-center gap-3 shrink-0">
           {pageInfo.breadcrumbs.map((crumb) => (
             <div key={crumb.href} className="flex items-center gap-3">
               <Link
                 href={prefixHref(crumb.href)}
-                className="text-xl font-heading font-bold text-dark-text-secondary hover:text-white transition-colors"
+                className="text-xl font-heading font-bold text-dark-text-secondary hover:text-dark-text transition-colors"
               >
                 {crumb.label}
               </Link>
               <ChevronRightIcon className="w-4 h-4 text-dark-text-secondary" />
             </div>
           ))}
-          <h1 className="text-xl font-heading font-bold text-white">{displayTitle}</h1>
+          <h1 className="text-xl font-heading font-bold text-dark-text">{displayTitle}</h1>
         </div>
 
         {/* Desktop Tabs - absolutely centered in header */}
@@ -199,7 +268,7 @@ export default function Sidebar() {
                 <button
                   key={tab.key}
                   onClick={() => onTabChange?.(tab.key)}
-                  className="relative z-10 flex-1 py-1.5 rounded-lg text-sm font-heading text-center text-white"
+                  className="relative z-10 flex-1 py-1.5 rounded-lg text-sm font-heading text-center text-dark-text"
                 >
                   {tab.label}
                 </button>
@@ -212,7 +281,7 @@ export default function Sidebar() {
         <div className="ml-auto flex items-center gap-3">
           <Link
             href={prefixHref('/notifications')}
-            className="relative p-2 rounded-xl text-dark-text-secondary hover:text-white hover:bg-white/10 transition-colors"
+            className="relative p-2 rounded-xl text-dark-text-secondary hover:text-dark-text hover:bg-dark-text/10 transition-colors"
           >
             <BellIcon className="w-5 h-5" />
             {unreadCount > 0 && (
@@ -226,7 +295,10 @@ export default function Sidebar() {
 
       {/* Mobile Tabs - separate bar below header */}
       {headerTabs.length > 0 && (
-        <div className="md:hidden fixed top-16 left-12 right-0 h-12 bg-nav-bg/80 backdrop-blur-xl border-b border-nav-border z-40 flex items-center justify-center px-3">
+        <div
+          className={`md:hidden fixed top-16 right-0 h-12 bg-nav-bg border-b border-nav-border z-40 flex items-center justify-center px-3 ${expanded ? '' : 'left-12'}`}
+          style={expanded ? { left: '14rem' } : undefined}
+        >
           <div className="relative flex bg-dark-bg/60 border border-dark-border rounded-xl p-1" style={{ width: `${headerTabs.length * 6}rem` }}>
             <div
               className="absolute top-1 bottom-1 bg-accent rounded-lg transition-all duration-200 ease-out"
@@ -239,7 +311,7 @@ export default function Sidebar() {
               <button
                 key={tab.key}
                 onClick={() => onTabChange?.(tab.key)}
-                className="relative z-10 flex-1 py-1.5 rounded-lg text-xs font-heading text-center text-white"
+                className="relative z-10 flex-1 py-1.5 rounded-lg text-xs font-heading text-center text-dark-text"
               >
                 {tab.label}
               </button>
@@ -249,39 +321,56 @@ export default function Sidebar() {
       )}
 
       {/* Left Sidebar */}
-      <div className="fixed top-0 bottom-0 left-0 w-12 md:w-16 bg-nav-bg flex flex-col z-50 border-r border-nav-border">
+      <div className={`fixed top-0 bottom-0 left-0 ${sidebarWidth} bg-nav-bg flex flex-col z-50 border-r border-nav-border transition-[width] duration-200 overflow-hidden`}>
         {/* Logo / Dashboard link */}
-        <Tooltip label="Dashboard">
+        <Tooltip label="Dashboard" show={!expanded}>
           <Link
             href={prefixHref('/')}
             className={`
-              w-full h-16 flex items-center justify-center border-b border-nav-border
-              ${isOnDashboard ? 'bg-accent' : 'bg-dark-bg hover:bg-white/10'}
+              w-full h-16 flex items-center border-b border-nav-border shrink-0
+              ${isOnDashboard ? 'bg-accent' : 'bg-dark-bg hover:bg-dark-text/10'}
               transition-colors
             `}
           >
-            <img src="/mavericks-logo.png" alt="Mavericks" className="w-6 h-6 md:w-8 md:h-8 rounded-lg object-cover" />
+            <div className={ICON_COL}>
+              <img src="/mavericks-logo.png" alt="Mavericks" className="w-6 h-6 md:w-8 md:h-8 rounded-lg object-cover" />
+            </div>
+            <span className="text-sm font-heading font-bold text-white truncate whitespace-nowrap">{expanded ? 'Mavericks' : ''}</span>
           </Link>
         </Tooltip>
 
         {/* Navigation Items */}
-        <nav className="flex-1 flex flex-col space-y-1 md:space-y-2 pt-2 md:pt-4 pb-2 px-1 md:px-2 overflow-y-auto">
+        <nav className="flex-1 flex flex-col space-y-1 md:space-y-2 pt-2 md:pt-4 pb-2 overflow-y-auto overflow-x-hidden">
           {visibleNavigation.map((item) => {
             const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
             const Icon = item.icon
+            const badge = item.href === '/candidate-pool' && poolCount > 0 ? poolCount : 0
             return (
-              <Tooltip key={item.name} label={item.name}>
+              <Tooltip key={item.name} label={item.name} show={!expanded}>
                 <Link
                   href={prefixHref(item.href)}
                   className={`
-                    h-10 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl transition-all
+                    relative h-10 md:h-12 flex items-center rounded-xl md:rounded-2xl transition-colors
                     ${isActive
                       ? 'bg-accent text-white shadow-glow'
-                      : 'text-dark-text-secondary hover:bg-white/10 hover:text-white'
+                      : 'text-dark-text-secondary hover:bg-dark-text/10 hover:text-dark-text'
                     }
                   `}
                 >
-                  <Icon className="w-5 h-5 md:w-6 md:h-6" />
+                  <div className={ICON_COL}>
+                    <Icon className="w-5 h-5 md:w-6 md:h-6" />
+                  </div>
+                  <span className="text-sm truncate whitespace-nowrap">{item.name}</span>
+                  {badge > 0 && !expanded && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-yellow-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center shrink-0">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
+                  {badge > 0 && expanded && (
+                    <span className="ml-auto mr-2 w-4 h-4 bg-yellow-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center shrink-0">
+                      {badge > 9 ? '9+' : badge}
+                    </span>
+                  )}
                 </Link>
               </Tooltip>
             )
@@ -289,43 +378,76 @@ export default function Sidebar() {
         </nav>
 
         {/* Bottom Section */}
-        <div className="px-1 md:px-2 pb-2 space-y-1 md:space-y-2">
+        <div className="pb-2 space-y-1 md:space-y-2">
           <div className="h-px bg-nav-border mx-1" />
+
+          {/* Collapse/Expand toggle */}
+          <Tooltip label={expanded ? 'Collapse' : 'Expand'} show={!expanded}>
+            <button
+              onClick={toggleSidebar}
+              className="w-full h-10 md:h-12 flex items-center rounded-xl md:rounded-2xl transition-colors text-dark-text-secondary hover:bg-dark-text/10 hover:text-dark-text"
+            >
+              <div className={ICON_COL}>
+                {expanded ? <ChevronDoubleLeftIcon className="w-5 h-5" /> : <ChevronDoubleRightIcon className="w-5 h-5" />}
+              </div>
+              <span className="text-sm whitespace-nowrap">{expanded ? 'Collapse' : ''}</span>
+            </button>
+          </Tooltip>
 
           {/* User Menu */}
           <div className="relative">
-            <Tooltip label={userName}>
+            <Tooltip label={userName} show={!expanded}>
               <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="w-full h-10 md:h-12 flex items-center justify-center rounded-xl md:rounded-2xl transition-colors hover:bg-white/10"
+                ref={userBtnRef}
+                onClick={handleUserMenuClick}
+                className="w-full h-10 md:h-12 flex items-center rounded-xl md:rounded-2xl transition-colors hover:bg-dark-text/10"
               >
-                <div className="w-7 h-7 md:w-8 md:h-8 bg-accent rounded-full flex items-center justify-center">
-                  <span className="text-white font-semibold text-xs md:text-sm">{userInitials}</span>
+                <div className={ICON_COL}>
+                  <div className="w-7 h-7 md:w-8 md:h-8 bg-accent rounded-full flex items-center justify-center">
+                    <span className="text-white font-semibold text-xs md:text-sm">{userInitials}</span>
+                  </div>
                 </div>
+                {expanded && (
+                  <div className="text-left min-w-0">
+                    <p className="text-xs font-medium text-dark-text truncate">{userName}</p>
+                    <p className="text-[10px] text-dark-text-secondary">{userRoleLabel}</p>
+                  </div>
+                )}
               </button>
             </Tooltip>
-
-            {showMenu && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                <div className="absolute bottom-0 left-full ml-2 bg-dark-card rounded-2xl shadow-card-hover border border-dark-border py-2 z-50 min-w-[220px]">
-                  <div className="px-4 py-3 border-b border-dark-border">
-                    <p className="text-sm font-medium text-white">{userName}</p>
-                    <p className="text-xs text-dark-text-secondary">{userRoleLabel}</p>
-                  </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full px-4 py-3 text-left text-sm text-error hover:bg-error/10 flex items-center gap-3 transition-colors"
-                  >
-                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                    Sign Out
-                  </button>
-                </div>
-              </>
-            )}
           </div>
         </div>
       </div>
+
+      {/* User Menu Popover - rendered outside the sidebar to avoid overflow clipping */}
+      {showMenu && (
+        <>
+          <div className="fixed inset-0 z-[60]" onClick={() => setShowMenu(false)} />
+          <div
+            className="fixed bg-dark-card rounded-2xl shadow-card-hover border border-dark-border py-2 z-[70] min-w-[220px]"
+            style={menuPos ? { bottom: menuPos.bottom, left: menuPos.left } : undefined}
+          >
+            <div className="px-4 py-3 border-b border-dark-border">
+              <p className="text-sm font-medium text-dark-text">{userName}</p>
+              <p className="text-xs text-dark-text-secondary">{userRoleLabel}</p>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className="w-full px-4 py-3 text-left text-sm text-dark-text-secondary hover:bg-dark-text/10 flex items-center gap-3 transition-colors"
+            >
+              {theme === 'dark' ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
+              {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="w-full px-4 py-3 text-left text-sm text-error hover:bg-error/10 flex items-center gap-3 transition-colors"
+            >
+              <ArrowRightOnRectangleIcon className="w-5 h-5" />
+              Sign Out
+            </button>
+          </div>
+        </>
+      )}
     </>
   )
 }

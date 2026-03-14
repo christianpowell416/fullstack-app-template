@@ -163,7 +163,7 @@ export default function ImportPage() {
               : 'border-dark-border bg-dark-card hover:border-dark-text-secondary'
           }`}
         >
-          <h3 className="text-sm font-medium text-white">LinkedIn Outbound</h3>
+          <h3 className="text-sm font-medium text-dark-text">LinkedIn Outbound</h3>
           <p className="text-xs text-dark-text-secondary mt-1">
             Import weekly outbound message counts from LinkedIn exports
           </p>
@@ -176,7 +176,7 @@ export default function ImportPage() {
               : 'border-dark-border bg-dark-card hover:border-dark-text-secondary'
           }`}
         >
-          <h3 className="text-sm font-medium text-white">Candidates</h3>
+          <h3 className="text-sm font-medium text-dark-text">Candidates</h3>
           <p className="text-xs text-dark-text-secondary mt-1">
             Bulk import candidates from a CSV file (migration from Excel)
           </p>
@@ -209,7 +209,7 @@ export default function ImportPage() {
           <div className="flex items-center justify-center gap-3">
             <DocumentTextIcon className="w-8 h-8 text-accent" />
             <div className="text-left">
-              <p className="text-sm text-white">{file.name}</p>
+              <p className="text-sm text-dark-text">{file.name}</p>
               <p className="text-xs text-dark-text-secondary">{(file.size / 1024).toFixed(1)} KB</p>
             </div>
           </div>
@@ -239,7 +239,7 @@ export default function ImportPage() {
             ) : (
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-400" />
             )}
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-dark-text">
               {result.success} record{result.success !== 1 ? 's' : ''} imported
             </span>
           </div>
