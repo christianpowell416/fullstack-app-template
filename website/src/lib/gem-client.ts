@@ -3,7 +3,16 @@
 // ===========================================
 // Pulls outbound metrics and candidate data from Gem.
 // API key must be set in GEM_API_KEY env var.
-// Docs: https://api.gem.com/v0/reference
+//
+// Available endpoints (v0):
+//   /users - list team users (flat array, "name" field)
+//   /candidates - list candidates with created_by, created_after filters
+//   /sequences - list sequences per user
+//   /projects - list Gem projects
+//   /project_candidate_membership_log - add/remove events per project
+//
+// NOTE: /candidates/events is DEPRECATED (returns 403).
+// We use candidate creation counts as the outbound proxy instead.
 
 const GEM_BASE_URL = 'https://api.gem.com/v0'
 
@@ -43,19 +52,25 @@ async function gemFetch<T>(path: string, options?: RequestInit): Promise<T> {
 export interface GemUser {
   id: string
   email: string
-  first_name: string
-  last_name: string
+  name: string // API returns "name", NOT first_name/last_name
 }
 
-export interface GemCandidateEvent {
+export interface GemCandidate {
   id: string
-  candidate_id: string
-  event_type: 'sequences' | 'sequence_replies' | 'manual_touchpoints'
-  event_subtype: 'first_outreach' | 'follow_up' | 'reply' | null
-  contact_medium: 'inmail' | 'phone_call' | 'text_message' | 'email' | 'meeting' | 'li_connect_request' | null
-  reply_status: 'interested' | 'not_interested' | 'later' | null
-  created_at: string
-  user_id: string
+  first_name: string
+  last_name: string
+  company: string | null
+  title: string | null
+  school: string | null
+  location: string | null
+  linked_in_handle: string | null
+  gem_source: string | null
+  sourced_from: string | null
+  created_at: number // Unix timestamp
+  created_by: string // Gem user ID
+  project_ids: string[]
+  emails: { email_address: string; is_primary: boolean }[]
+  education_info: { school: string; degree: string; field_of_study: string }[]
 }
 
 export interface GemProject {
@@ -63,94 +78,95 @@ export interface GemProject {
   name: string
   is_archived: boolean
   user_id: string
+  created_at: number
 }
 
-interface PaginatedResponse<T> {
-  data: T[]
+export interface GemMembershipLog {
+  action: 'add' | 'remove'
+  candidate_id: string
+  project_id: string
+  timestamp: number
 }
 
 // --- API Methods ---
 
-/** List all Gem team users */
+/** List all Gem team users. Returns flat array (NOT paginated wrapper). */
 export async function getGemUsers(): Promise<GemUser[]> {
-  const res = await gemFetch<PaginatedResponse<GemUser>>('/users?page_size=100')
-  return res.data
+  return gemFetch<GemUser[]>('/users?page_size=100')
 }
 
-/** List candidate events (outreach activity) for a date range */
-export async function getCandidateEvents(params: {
-  userId?: string
-  createdAfter?: string   // ISO date
-  createdBefore?: string  // ISO date
+/**
+ * List Gem candidates with filters. Returns flat array.
+ * Dates are Unix timestamps (seconds).
+ */
+export async function getGemCandidates(params: {
+  createdBy?: string
+  createdAfter?: number  // Unix timestamp (seconds)
+  createdBefore?: number // Unix timestamp (seconds)
   page?: number
   pageSize?: number
-}): Promise<GemCandidateEvent[]> {
+}): Promise<GemCandidate[]> {
   const searchParams = new URLSearchParams()
-  if (params.userId) searchParams.set('created_by', params.userId)
-  if (params.createdAfter) searchParams.set('created_after', params.createdAfter)
-  if (params.createdBefore) searchParams.set('created_before', params.createdBefore)
+  if (params.createdBy) searchParams.set('created_by', params.createdBy)
+  if (params.createdAfter) searchParams.set('created_after', String(params.createdAfter))
+  if (params.createdBefore) searchParams.set('created_before', String(params.createdBefore))
   searchParams.set('page', String(params.page || 1))
   searchParams.set('page_size', String(params.pageSize || 100))
 
-  const res = await gemFetch<PaginatedResponse<GemCandidateEvent>>(
-    `/candidates/events?${searchParams.toString()}`
-  )
-  return res.data
+  return gemFetch<GemCandidate[]>(`/candidates?${searchParams.toString()}`)
 }
 
-/** Get all candidate events for a user in a date range (handles pagination) */
-export async function getAllEventsForUser(
+/**
+ * Get ALL candidates created by a specific user in a date range.
+ * Handles pagination automatically. Each candidate created = 1 outbound contact.
+ */
+export async function getAllCandidatesForUser(
   gemUserId: string,
-  startDate: string,
-  endDate: string
-): Promise<GemCandidateEvent[]> {
-  const allEvents: GemCandidateEvent[] = []
+  startTimestamp: number,
+  endTimestamp: number
+): Promise<GemCandidate[]> {
+  const allCandidates: GemCandidate[] = []
   let page = 1
   const pageSize = 100
 
   while (true) {
-    const events = await getCandidateEvents({
-      userId: gemUserId,
-      createdAfter: startDate,
-      createdBefore: endDate,
+    const candidates = await getGemCandidates({
+      createdBy: gemUserId,
+      createdAfter: startTimestamp,
+      createdBefore: endTimestamp,
       page,
       pageSize,
     })
 
-    allEvents.push(...events)
+    allCandidates.push(...candidates)
 
-    if (events.length < pageSize) break
+    if (candidates.length < pageSize) break
     page++
 
-    // Safety: max 50 pages (5000 events)
+    // Safety: max 50 pages (5000 candidates)
     if (page > 50) break
   }
 
-  return allEvents
+  return allCandidates
 }
 
-/** Calculate outbound metrics from events */
-export function calculateOutboundMetrics(events: GemCandidateEvent[]) {
-  const outboundEvents = events.filter(
-    e => e.event_type === 'sequences' || e.event_type === 'manual_touchpoints'
-  )
-  const replyEvents = events.filter(e => e.event_type === 'sequence_replies')
-  const interestedEvents = replyEvents.filter(e => e.reply_status === 'interested')
-
+/**
+ * Calculate outbound metrics from candidate creation counts.
+ * Each candidate added to Gem = one outbound contact sourced.
+ */
+export function calculateOutboundMetrics(candidates: GemCandidate[]) {
   return {
-    outbound_count: outboundEvents.length,
-    emails_replied: replyEvents.length,
-    interested_count: interestedEvents.length,
-    interest_rate: outboundEvents.length > 0
-      ? (interestedEvents.length / outboundEvents.length) * 100
-      : 0,
-    reply_rate: outboundEvents.length > 0
-      ? (replyEvents.length / outboundEvents.length) * 100
-      : 0,
+    outbound_count: candidates.length,
+    // We don't have email open/reply data from the candidates endpoint,
+    // so these default to 0. They can be supplemented via manual entry.
+    emails_replied: 0,
+    interested_count: 0,
+    interest_rate: 0,
+    reply_rate: 0,
   }
 }
 
-/** List Gem projects */
+/** List Gem projects. Returns flat array. */
 export async function getGemProjects(params?: {
   userId?: string
   isArchived?: boolean
@@ -160,8 +176,23 @@ export async function getGemProjects(params?: {
   if (params?.isArchived !== undefined) searchParams.set('is_archived', String(params.isArchived))
   searchParams.set('page_size', '100')
 
-  const res = await gemFetch<PaginatedResponse<GemProject>>(
-    `/projects?${searchParams.toString()}`
+  return gemFetch<GemProject[]>(`/projects?${searchParams.toString()}`)
+}
+
+/** Get project candidate membership log (requires project_id or candidate_id). */
+export async function getProjectMembershipLog(params: {
+  projectId?: string
+  candidateId?: string
+  page?: number
+  pageSize?: number
+}): Promise<GemMembershipLog[]> {
+  const searchParams = new URLSearchParams()
+  if (params.projectId) searchParams.set('project_id', params.projectId)
+  if (params.candidateId) searchParams.set('candidate_id', params.candidateId)
+  searchParams.set('page', String(params.page || 1))
+  searchParams.set('page_size', String(params.pageSize || 100))
+
+  return gemFetch<GemMembershipLog[]>(
+    `/project_candidate_membership_log?${searchParams.toString()}`
   )
-  return res.data
 }

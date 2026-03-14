@@ -66,6 +66,7 @@ export interface Project {
   start_date: string
   end_date: string
   hire_goal: number
+  gem_project_id: string | null
   status: 'active' | 'completed' | 'paused' | 'cancelled'
   created_at: string
   updated_at: string
@@ -133,6 +134,9 @@ export interface Candidate {
 
   // Resume
   resume_url: string | null
+
+  // Gem integration
+  gem_candidate_id: string | null
 
   // Tracking
   gender_id: number | null

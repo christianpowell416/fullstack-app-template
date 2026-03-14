@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/weekly-snapshot",
       "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/cron/gem-sync",
+      "schedule": "0 7 * * *"
     }
   ]
 }

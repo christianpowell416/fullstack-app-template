@@ -29,7 +29,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const gemUsers = await getGemUsers()
-    return NextResponse.json({ users: gemUsers })
+    // Gem returns { id, email, name } - split name for display
+    const users = gemUsers.map(u => ({
+      id: u.id,
+      email: u.email,
+      name: u.name,
+    }))
+    return NextResponse.json({ users })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
